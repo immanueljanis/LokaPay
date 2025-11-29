@@ -1,0 +1,17 @@
+{
+  "name": "api",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@tatumio/tatum": "^4.2.58",
+    "ethers": "^6.15.0",
+    "hono": "^4.10.7"
+  }
+}

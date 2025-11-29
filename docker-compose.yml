@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: lokapay_db
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: lokapay_admin
+      POSTGRES_PASSWORD: lokapay_password
+      POSTGRES_DB: lokapay_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
