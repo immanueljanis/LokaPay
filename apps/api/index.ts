@@ -3,8 +3,9 @@ import { logger } from 'hono/logger'
 import { cors } from 'hono/cors'
 import { z } from 'zod'
 import { prisma } from '@lokapay/database'
-import { randomUUID } from 'crypto'
 import { getRealExchangeRate, generateDepositWallet } from './lib/tatum'
+import { getFactoryContract, relayerSigner } from './constants/contracts'
+import { ethers } from 'ethers'
 
 const app = new Hono()
 
@@ -25,10 +26,6 @@ const createTransactionSchema = z.object({
     merchantId: z.string().uuid(),
     amountIDR: z.number().min(10000), // Minimal bayar Rp 10.000
 })
-const getExchangeRate = async () => {
-    // Ceritanya 1 USDT = Rp 15.800
-    return 15800
-}
 
 // 3. Endpoint Hello World (Cek Server)
 app.get('/', (c) => {
@@ -94,36 +91,36 @@ app.post('/transaction/create', async (c) => {
         const body = await c.req.json()
         const data = createTransactionSchema.parse(body)
 
-        // A. Ambil Rate Realtime
-        const rate = await getRealExchangeRate() // <-- Pakai fungsi real
-
-        // B. Hitung Konversi & Spread (Sama kayak tadi)
+        // A. Ambil Rate (Tetap sama)
+        const rate = await getRealExchangeRate()
         const rawUSDT = data.amountIDR / rate
         const spread = rawUSDT * 0.015
         const finalUSDT = rawUSDT + spread
 
-        // C. Generate Address Tujuan (GANTI INI)
-        const walletData = await generateDepositWallet() // <-- Generate Wallet Baru
-        const paymentAddress = walletData.address
+        // B. Generate Salt & Address (LOGIC BARU V2)
+        const invoiceUUID = crypto.randomUUID()
+        const salt = ethers.id(invoiceUUID) // Convert string ke bytes32
 
-        // WARNING: Di MVP ini, Private Key kita simpan di DB dulu agar gampang ditest.
-        // DI PRODUCTION: JANGAN SIMPAN PRIVATE KEY PLAN TEXT DI DATABASE!
+        // Kita tanya ke Factory: "Kalau salt-nya ini, alamatnya nanti apa?"
+        // Owner vault adalah 'relayerSigner' kita (agar nanti backend bisa perintah sweep)
+        const factory = getFactoryContract()
+        const predictedAddress = await (factory.getVaultAddress as (salt: string, owner: string) => Promise<string>)(salt, relayerSigner.address)
 
+        // C. Simpan ke DB (Update field baru)
         const transaction = await prisma.transaction.create({
             data: {
                 merchantId: data.merchantId,
                 amountIDR: data.amountIDR,
                 amountUSDT: finalUSDT,
                 exchangeRate: rate,
-                network: "BSC",
-                paymentAddress: paymentAddress,
+                network: "MANTLE", // Ganti jadi MANTLE
 
-                // SIMPAN KEY DISINI
-                // Di Production, ini harus dienkripsi dulu (misal pakai AES)
-                privateKey: walletData.privateKey,
+                paymentAddress: predictedAddress, // Alamat Smart Vault
+                salt: salt,                       // Simpan Salt ini baik-baik!
+                isDeployed: false,                // Belum dideploy
 
                 expiresAt: new Date(Date.now() + 5 * 60 * 1000)
-            }
+            } as any // Temporary fix until Prisma client is regenerated
         })
 
         return c.json({
@@ -133,7 +130,7 @@ app.post('/transaction/create', async (c) => {
                 amountIDR: data.amountIDR,
                 amountUSDT: finalUSDT.toFixed(4), // Tampilkan 4 desimal
                 rateUsed: rate,
-                paymentAddress: paymentAddress,
+                paymentAddress: predictedAddress,
                 expiresIn: '5 minutes'
             }
         }, 201)

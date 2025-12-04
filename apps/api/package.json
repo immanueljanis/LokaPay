@@ -10,6 +10,7 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@gelatonetwork/relay-sdk": "^5.6.0",
     "@tatumio/tatum": "^4.2.58",
     "ethers": "^6.15.0",
     "hono": "^4.10.7"

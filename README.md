@@ -66,7 +66,7 @@ Copy file `.env.example` (buat manual jika belum ada) di `apps/api` dan `package
 DATABASE_URL="postgresql://lokapay_admin:lokapay_password@localhost:5433/lokapay_db?schema=public"
 TATUM_API_KEY="your_tatum_api_key"
 WEBHOOK_BASE_URL="[https://url-ngrok-anda.ngrok-free.app](https://url-ngrok-anda.ngrok-free.app)" 
-BSC_RPC_URL="[https://bsc-dataseed.binance.org/](https://bsc-dataseed.binance.org/)"
+RPC_URL="[https://bsc-dataseed.binance.org/](https://bsc-dataseed.binance.org/)"
 # Wallet Pribadi Anda (Penyuplai Bensin)
 ADMIN_PRIVATE_KEY="0x..." 
 # Wallet Tujuan Akhir (Safe Multisig)
