@@ -15,6 +15,11 @@ app.use('*', logger()) // Agar log request muncul di terminal
 app.use('*', cors())   // Agar frontend (Next.js) bisa akses API ini
 
 // 2. Schema Validasi Input (Zod)
+const loginSchema = z.object({
+    email: z.string().email(),
+    password: z.string(),
+})
+
 const registerSchema = z.object({
     name: z.string().min(3),
     email: z.string().email(),
@@ -81,6 +86,45 @@ app.post('/auth/register', async (c) => {
             return c.json({ error: e.issues }, 400)
         }
         // Handle Error Lainnya
+        console.error(e)
+        return c.json({ error: 'Internal Server Error' }, 500)
+    }
+})
+
+// Endpoint Login Merchant
+app.post('/auth/login', async (c) => {
+    try {
+        const body = await c.req.json()
+        const data = loginSchema.parse(body)
+
+        const merchant = await prisma.merchant.findUnique({
+            where: { email: data.email }
+        })
+
+        if (!merchant) {
+            return c.json({ error: 'Email atau password salah' }, 401)
+        }
+
+        const isMatch = await Bun.password.verify(data.password, merchant.passwordHash)
+
+        if (!isMatch) {
+            return c.json({ error: 'Email atau password salah' }, 401)
+        }
+
+        return c.json({
+            message: 'Login successful',
+            merchant: {
+                id: merchant.id,
+                name: merchant.name,
+                email: merchant.email,
+                balanceIDR: merchant.balanceIDR
+            }
+        })
+
+    } catch (e) {
+        if (e instanceof z.ZodError) {
+            return c.json({ error: e.issues[0]?.message }, 400)
+        }
         console.error(e)
         return c.json({ error: 'Internal Server Error' }, 500)
     }
