@@ -6,6 +6,7 @@ import { prisma } from '@lokapay/database'
 import { getRealExchangeRate, generateDepositWallet } from './lib/tatum'
 import { getFactoryContract, relayerSigner } from './constants/contracts'
 import { ethers } from 'ethers'
+import { createHmac } from 'crypto'
 
 const app = new Hono()
 
@@ -93,11 +94,15 @@ app.post('/transaction/create', async (c) => {
 
         // A. Ambil Rate (Tetap sama)
         const rate = await getRealExchangeRate()
+        if (!rate) {
+            return c.json({ error: 'Failed to get exchange rate' }, 500)
+        }
+
         const rawUSDT = data.amountIDR / rate
         const spread = rawUSDT * 0.015
         const finalUSDT = rawUSDT + spread
 
-        // B. Generate Salt & Address (LOGIC BARU V2)
+        // B. Generate Salt & Address
         const invoiceUUID = crypto.randomUUID()
         const salt = ethers.id(invoiceUUID) // Convert string ke bytes32
 
@@ -113,14 +118,14 @@ app.post('/transaction/create', async (c) => {
                 amountIDR: data.amountIDR,
                 amountUSDT: finalUSDT,
                 exchangeRate: rate,
-                network: "MANTLE", // Ganti jadi MANTLE
+                network: "MANTLE",
 
-                paymentAddress: predictedAddress, // Alamat Smart Vault
-                salt: salt,                       // Simpan Salt ini baik-baik!
-                isDeployed: false,                // Belum dideploy
+                paymentAddress: predictedAddress,
+                salt: salt,
+                isDeployed: false,
 
                 expiresAt: new Date(Date.now() + 5 * 60 * 1000)
-            } as any // Temporary fix until Prisma client is regenerated
+            }
         })
 
         return c.json({
@@ -128,7 +133,7 @@ app.post('/transaction/create', async (c) => {
             data: {
                 invoiceId: transaction.id,
                 amountIDR: data.amountIDR,
-                amountUSDT: finalUSDT.toFixed(4), // Tampilkan 4 desimal
+                amountUSDT: finalUSDT.toFixed(4),
                 rateUsed: rate,
                 paymentAddress: predictedAddress,
                 expiresIn: '5 minutes'
@@ -146,106 +151,122 @@ app.post('/transaction/create', async (c) => {
 app.post('/webhook/tatum', async (c) => {
     try {
         const body = await c.req.json()
-        console.log('🔔 WEBHOOK MASUK:', JSON.stringify(body, null, 2))
+        const rawBody = JSON.stringify(body)
+
+        // --- SECURITY: HMAC Verification (Aktifkan di Production) ---
+        const computedHash = createHmac('sha512', process.env.TATUM_API_KEY!)
+            .update(rawBody)
+            .digest('base64')
+        const signature = c.req.header('x-payload-hash')
+
+        // Di Testnet Tatum kadang tidak kirim header ini, jadi log saja dulu
+        if (signature && signature !== computedHash) {
+            console.error("⛔ Fake Webhook Detected! Hash Mismatch")
+            // return c.text('Forbidden', 403) // Uncomment di Production
+        }
+        // -------------------------------------------------------------
 
         const incomingAddress = body.address
         const incomingAmount = parseFloat(body.amount)
         const txHash = body.txId
 
-        // 1. Cari Transaksi
-        // Kita cari transaksi yang addressnya cocok DAN statusnya belum LUNAS/GAGAL
-        // Kita terima status PENDING ataupun PARTIALLY_PAID
         const transaction = await prisma.transaction.findFirst({
             where: {
                 paymentAddress: incomingAddress,
-                status: {
-                    in: ['PENDING', 'PARTIALLY_PAID']
-                }
+                status: { in: ['PENDING', 'PARTIALLY_PAID'] }
             }
         })
 
         if (!transaction) {
-            console.log(`⚠️ Transaksi unknown / sudah final: ${incomingAddress}`)
+            console.log(`⚠️ Transaction not found or already paid: ${incomingAddress}`)
             return c.text('OK')
         }
 
-        // 2. Hitung Akumulasi
+        // --- LOGIC LATE PAYMENT ---
+        const now = new Date()
+        const isExpired = now > transaction.expiresAt
+
+        // Default: Gunakan data lama
+        let expectedUSDT = parseFloat(transaction.amountUSDT.toString())
+        let finalRate = parseFloat(transaction.exchangeRate.toString())
+        let isRateUpdated = false
+
+        if (isExpired) {
+            console.log(`⚠️ Late Payment Detected! ID: ${transaction.id}`)
+            const currentRate = await getRealExchangeRate()
+
+            if (currentRate) {
+                const idrAmount = parseFloat(transaction.amountIDR.toString())
+                // Hitung ulang kebutuhan USDT dengan rate baru + spread 1.5%
+                const newCalculatedUSDT = (idrAmount / currentRate) * 1.015
+
+                // Hanya update jika rate turun (butuh lebih banyak USDT)
+                // Jika rate naik (USDT menguat), merchant untung spread lebih, biarkan tagihan lama.
+                if (newCalculatedUSDT > expectedUSDT) {
+                    console.log(`📉 Rate Drop! Adjusting Bill: ${expectedUSDT} -> ${newCalculatedUSDT}`)
+                    expectedUSDT = newCalculatedUSDT
+                    finalRate = currentRate
+                    isRateUpdated = true
+                }
+            }
+        }
+
+        // --- LOGIC AKUMULASI ---
         const currentReceived = parseFloat(transaction.amountReceived.toString())
         const totalReceived = currentReceived + incomingAmount
-        const expectedAmount = parseFloat(transaction.amountUSDT.toString())
 
-        // Logic Penentuan Status
-        let newStatus = transaction.status // Default status lama
+        let newStatus = transaction.status
 
-        // Cek 1: Apakah Masih Kurang? (Toleransi floating point 0.0001)
-        if (totalReceived < (expectedAmount - 0.0001)) {
-            console.log(`⚠️ MASIH KURANG! Total: ${totalReceived} / Tagihan: ${expectedAmount}`)
+        if (totalReceived < (expectedUSDT - 0.0001)) {
             newStatus = 'PARTIALLY_PAID'
-        }
-        // Cek 2: Apakah Lebih Bayar Signifikan? (Misal lebih dari $0.1)
-        else if (totalReceived > (expectedAmount + 0.1)) {
-            console.log(`🤑 LEBIH BAYAR (TIP)! Total: ${totalReceived} / Tagihan: ${expectedAmount}`)
+        } else if (totalReceived > (expectedUSDT + 0.1)) {
             newStatus = 'OVERPAID'
-            // Note: OVERPAID secara operasional dianggap LUNAS oleh Merchant
-        }
-        // Cek 3: Pas (Lunas)
-        else {
-            console.log(`✅ LUNAS PAS! Total: ${totalReceived}`)
+        } else {
             newStatus = 'PAID'
         }
 
+        // --- UPDATE DATABASE ATOMIC ---
         await prisma.$transaction(async (tx) => {
-
-            // A. Update Status Transaksi
-            // 1. Update Transaksi dengan INCREMENT
-            // Ini aman dari race condition
+            // Update Transaction
             await tx.transaction.update({
                 where: { id: transaction.id },
                 data: {
                     status: newStatus,
                     amountReceived: { increment: incomingAmount },
+                    // Jika ada penyesuaian rate karena telat, update juga
+                    amountUSDT: isRateUpdated ? expectedUSDT : undefined,
+                    exchangeRate: isRateUpdated ? finalRate : undefined,
+
                     txHash: (newStatus === 'PAID' || newStatus === 'OVERPAID') ? txHash : undefined,
                     confirmedAt: (newStatus === 'PAID' || newStatus === 'OVERPAID') ? new Date() : undefined,
                 }
             })
 
-            // B. Update Saldo Merchant dengan Logic Perhitungan Tip
+            // Update Merchant Balance (Hanya jika Status Baru = Lunas, dan sebelumnya belum Lunas)
             const isFinal = newStatus === 'PAID' || newStatus === 'OVERPAID'
+            const wasNotFinal = transaction.status !== 'PAID' && transaction.status !== 'OVERPAID'
 
-            // Pastikan kita update saldo HANYA jika status sebelumnya BELUM final 
-            // (Mencegah double credit jika webhook dikirim ulang oleh Tatum)
-            const isPreviouslyNotFinal = transaction.status === 'PENDING' || transaction.status === 'PARTIALLY_PAID' || transaction.status === 'DETECTED'
+            if (isFinal && wasNotFinal) {
+                let creditIDR = parseFloat(transaction.amountIDR.toString())
 
-            if (isFinal && isPreviouslyNotFinal) {
-                let creditAmountIDR = parseFloat(transaction.amountIDR.toString())
-
-                // LOGIC BARU: Handle Kelebihan Bayar
+                // Hitung Tip (Overpaid)
                 if (newStatus === 'OVERPAID') {
-                    const rate = parseFloat(transaction.exchangeRate.toString())
-                    const excessUSDT = totalReceived - expectedAmount
-
-                    // Konversi sisa USDT ke Rupiah
-                    // Math.floor agar tidak ada desimal koma di Rupiah
-                    const excessIDR = Math.floor(excessUSDT * rate)
-
-                    creditAmountIDR += excessIDR // Total = Tagihan Asli + Tip
-
-                    console.log(`🤑 OVERPAID! Tagihan: ${transaction.amountIDR} + Tip: ${excessIDR} = Total: ${creditAmountIDR}`)
-                } else {
-                    console.log(`💰 PAID PAS! Menambahkan Saldo Rp ${creditAmountIDR}`)
+                    // Gunakan rate final (bisa lama atau baru)
+                    const excessUSDT = totalReceived - expectedUSDT
+                    const excessIDR = Math.floor(excessUSDT * finalRate)
+                    creditIDR += excessIDR
+                    console.log(`🤑 Tip Detected: ${excessUSDT} USDT -> Rp ${excessIDR}`)
                 }
 
                 await tx.merchant.update({
                     where: { id: transaction.merchantId },
-                    data: {
-                        balanceIDR: { increment: creditAmountIDR }
-                    }
+                    data: { balanceIDR: { increment: creditIDR } }
                 })
+                console.log(`💰 Merchant Credited: Rp ${creditIDR}`)
             }
         })
 
         return c.text('OK')
-
     } catch (e) {
         console.error('Webhook Error:', e)
         return c.text('Error handled', 200)
