@@ -3,7 +3,7 @@ import { logger } from 'hono/logger'
 import { cors } from 'hono/cors'
 import { z } from 'zod'
 import { prisma } from '@lokapay/database'
-import { getRealExchangeRate, generateDepositWallet } from './lib/tatum'
+import { getRealExchangeRate, subscribeToIncomingTxs } from './lib/tatum'
 import { getFactoryContract, relayerSigner } from './constants/contracts'
 import { ethers } from 'ethers'
 import { createHmac } from 'crypto'
@@ -110,6 +110,16 @@ app.post('/transaction/create', async (c) => {
         // Owner vault adalah 'relayerSigner' kita (agar nanti backend bisa perintah sweep)
         const factory = getFactoryContract()
         const predictedAddress = await (factory.getVaultAddress as (salt: string, owner: string) => Promise<string>)(salt, relayerSigner.address)
+        const webhookBase = process.env.WEBHOOK_BASE_URL
+
+        if (webhookBase) {
+            const webhookUrl = `${webhookBase}/webhook/tatum`
+            subscribeToIncomingTxs(predictedAddress, webhookUrl)
+                .then(id => console.log(`🪝 Hook registered: ${id}`))
+                .catch(err => console.error("Hook failed", err))
+        } else {
+            console.warn("⚠️ WEBHOOK_BASE_URL belum diset! Tatum tidak akan lapor.")
+        }
 
         // C. Simpan ke DB (Update field baru)
         const transaction = await prisma.transaction.create({
@@ -284,6 +294,33 @@ app.get('/transaction/:id', async (c) => {
     if (!transaction) return c.json({ error: 'Not found' }, 404)
 
     return c.json({ data: transaction })
+})
+
+// 6. Endpoint Get Merchant Dashboard (Profile + History)
+app.get('/merchant/:id/dashboard', async (c) => {
+    const id = c.req.param('id')
+
+    try {
+        const merchant = await prisma.merchant.findUnique({
+            where: { id },
+            include: {
+                transactions: {
+                    orderBy: { createdAt: 'desc' }, // Urutkan dari yang terbaru
+                    take: 20 // Ambil 20 terakhir saja biar ringan
+                }
+            }
+        })
+
+        if (!merchant) return c.json({ error: 'Merchant not found' }, 404)
+
+        // Return data yang aman (hapus passwordHash)
+        const { passwordHash, ...safeMerchant } = merchant
+        return c.json({ data: safeMerchant })
+
+    } catch (e) {
+        console.error(e)
+        return c.json({ error: 'Server error' }, 500)
+    }
 })
 
 // Export untuk Bun

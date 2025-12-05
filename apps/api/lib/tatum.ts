@@ -1,4 +1,13 @@
 import { Wallet } from 'ethers'
+import { TatumSDK, Network, Ethereum } from '@tatumio/tatum'
+
+const tatum = await TatumSDK.init<Ethereum>(
+    {
+        network: Network.ETHEREUM,
+        apiKey: { v4: process.env.TATUM_API_KEY },
+        verbose: true
+    }
+)
 
 export const getRealExchangeRate = async (): Promise<number | null> => {
     try {
@@ -20,5 +29,20 @@ export const generateDepositWallet = async () => {
         address: wallet.address,
         privateKey: wallet.privateKey,
         mnemonic: wallet.mnemonic?.phrase
+    }
+}
+
+export const subscribeToIncomingTxs = async (address: string, webhookUrl: string) => {
+    try {
+        console.log(`📡 Subscribing Tatum to: ${address}`)
+        const subscription = await tatum.notification.subscribe.addressEvent({
+            url: webhookUrl,
+            address: address,
+        })
+        console.log('✅ Subscribed ID:', subscription.data.id)
+        return subscription.data.id
+    } catch (error) {
+        console.error('❌ Gagal subscribe webhook:', error)
+        return null
     }
 }
