@@ -7,12 +7,23 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "concurrently": "^9.2.1",
+    "wait-on": "^9.0.3"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "dependencies": {
     "zod": "^4.1.13"
+  },
+  "scripts": {
+    "docker:up": "docker-compose up",
+    "dev:api": "wait-on tcp:5433 && bun run --filter \"*api\" dev",  
+    "dev:web": "bun run --filter \"*web\" dev",
+
+    "clean": "docker-compose down && bun x kill-port 3000 3001 5433", 
+    "predev": "bun run clean",
+    "dev": "concurrently -k -n \"DB,API,WEB\" -c \"blue,magenta,cyan\" \"bun run docker:up\" \"bun run dev:api\" \"bun run dev:web\""
   }
 }
