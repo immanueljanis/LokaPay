@@ -3,7 +3,7 @@ import { logger } from 'hono/logger'
 import { cors } from 'hono/cors'
 import { z } from 'zod'
 import { prisma } from '@lokapay/database'
-import { getRealExchangeRate, subscribeToIncomingTxs } from './lib/tatum'
+import { getRealExchangeRate } from './utils/rate'
 import { getFactoryContract, relayerSigner } from './constants/contracts'
 import { ethers } from 'ethers'
 import { createHmac } from 'crypto'
@@ -154,16 +154,6 @@ app.post('/transaction/create', async (c) => {
         // Owner vault adalah 'relayerSigner' kita (agar nanti backend bisa perintah sweep)
         const factory = getFactoryContract()
         const predictedAddress = await (factory.getVaultAddress as (salt: string, owner: string) => Promise<string>)(salt, relayerSigner.address)
-        const webhookBase = process.env.WEBHOOK_BASE_URL
-
-        if (webhookBase) {
-            const webhookUrl = `${webhookBase}/webhook/tatum`
-            subscribeToIncomingTxs(predictedAddress, webhookUrl)
-                .then(id => console.log(`🪝 Hook registered: ${id}`))
-                .catch(err => console.error("Hook failed", err))
-        } else {
-            console.warn("⚠️ WEBHOOK_BASE_URL belum diset! Tatum tidak akan lapor.")
-        }
 
         // C. Simpan ke DB (Update field baru)
         const transaction = await prisma.transaction.create({

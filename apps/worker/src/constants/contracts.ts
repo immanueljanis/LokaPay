@@ -4,12 +4,15 @@ const provider = new ethers.JsonRpcProvider(process.env.RPC_URL)
 const relayerSigner = new ethers.Wallet(process.env.RELAYER_PRIVATE_KEY!, provider)
 
 const FACTORY_ADDRESS = process.env.FACTORY_ADDRESS!
-export const USDT_ADDRESS = process.env.USDT_ADDRESS!
+export const USDT_ADDRESS = process.env.USDT_ADDRESS! // Export biar bisa dipakai di sweeper
 
+// ABI Factory (Fungsi deploy & prediksi alamat)
 const FACTORY_ABI = [
     "function getVaultAddress(bytes32 salt, address owner) view returns (address)",
     "function deployVault(bytes32 salt, address owner) returns (address)"
 ]
+
+// ABI Vault (Fungsi sweep)
 const VAULT_ABI = [
     "function sweep(address token) external"
 ]
