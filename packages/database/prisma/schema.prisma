@@ -47,13 +47,19 @@ model Transaction {
   merchantId      String
   merchant        Merchant          @relation(fields: [merchantId], references: [id])
 
-  // Detail Nominal
-  amountIDR       Decimal           @db.Decimal(18, 2) // Tagihan asli: Rp 50.000
-  amountUSDT      Decimal           @db.Decimal(18, 6) // Tagihan Crypto: 3.40
-  amountReceived  Decimal           @default(0) @db.Decimal(18, 6) // Yang sudah masuk
-  exchangeRate    Decimal           @db.Decimal(18, 2) // Rate: Rp 15.800
-
-  // Logic Smart Vault (V2)
+  // Detail Nominal - Invoice
+  amountInvoice   Decimal           @db.Decimal(18, 2) // Jumlah tagihan dalam IDR (Rp 50.000)
+  amountUSDT      Decimal           @db.Decimal(18, 6) // Jumlah tagihan dalam USDT (termasuk spread)
+  exchangeRate    Decimal           @db.Decimal(18, 2) // Exchange rate saat transaksi (IDR per USDT)
+  
+  // Detail Nominal - Payment Received
+  amountReceivedUSDT Decimal        @default(0) @db.Decimal(18, 6) // Jumlah USDT yang diterima
+  amountReceivedIdr   Decimal       @default(0) @db.Decimal(18, 2) // Jumlah IDR yang diterima (amountReceivedUSDT * exchangeRate)
+  
+  // Detail Nominal - Breakdown
+  tipIdr          Decimal           @default(0) @db.Decimal(18, 2) // Tip jika overpaid (dalam IDR)
+  feeApp          Decimal           @default(0) @db.Decimal(18, 2) // Fee aplikasi (1.5% dari amountInvoice)
+  
   paymentAddress  String            @unique            // Alamat Vault (Hasil CREATE2)
   salt            String?           @unique            // PENGGANTI Private Key (UUID)
   isDeployed      Boolean           @default(false)    // Status apakah contract sudah dideploy
