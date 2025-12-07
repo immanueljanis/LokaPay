@@ -45,13 +45,13 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-            <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
+        <div className="min-h-screen flex items-center justify-center bg-background p-4">
+            <div className="max-w-md w-full bg-card rounded-xl shadow-lg p-8">
 
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-blue-600 mb-2">LokaPay</h1>
-                    <p className="text-gray-500">Masuk untuk mengelola bisnis Anda</p>
+                    <h1 className="text-3xl font-bold text-primary mb-2">LokaPay</h1>
+                    <p className="text-muted-foreground">Masuk untuk mengelola bisnis Anda</p>
                 </div>
 
                 {/* Error Alert */}
@@ -64,24 +64,24 @@ export default function LoginPage() {
                 {/* Form */}
                 <form onSubmit={handleLogin} className="space-y-5">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Email Merchant</label>
+                        <label className="block text-sm font-medium text-card-foreground mb-1">Email Merchant</label>
                         <input
                             type="email"
                             required
                             placeholder="contoh: bagus@lokapay.com"
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                            className="w-full p-3 border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-ring outline-none transition bg-background text-foreground"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <label className="block text-sm font-medium text-card-foreground mb-1">Password</label>
                         <input
                             type="password"
                             required
                             placeholder="••••••••"
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                            className="w-full p-3 border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-ring outline-none transition bg-background text-foreground"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
@@ -90,15 +90,15 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-blue-600 text-white font-bold py-3.5 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition shadow-md"
+                        className="w-full bg-primary text-primary-foreground font-bold py-3.5 rounded-lg hover:opacity-90 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition shadow-md"
                     >
                         {loading ? 'Memuat...' : 'Masuk Dashboard'}
                     </button>
                 </form>
 
                 {/* Footer */}
-                <div className="mt-6 text-center text-sm text-gray-400">
-                    Belum punya akun? <span className="text-blue-500 cursor-pointer hover:underline">Hubungi Admin</span>
+                <div className="mt-6 text-center text-sm text-muted-foreground">
+                    Belum punya akun? <span className="text-primary cursor-pointer hover:underline">Hubungi Admin</span>
                 </div>
             </div>
         </div>

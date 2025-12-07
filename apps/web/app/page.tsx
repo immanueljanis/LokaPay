@@ -41,22 +41,22 @@ export default function MerchantDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <div className="absolute top-4 left-4">
-        <button onClick={() => router.push('/dashboard')} className="text-blue-600 hover:underline">
+        <button onClick={() => router.push('/dashboard')} className="text-primary hover:underline">
           &larr; Kembali ke Dashboard
         </button>
       </div>
 
-      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
+      <div className="max-w-md w-full bg-card rounded-xl shadow-lg p-8">
         <form onSubmit={handleCreateInvoice} className="space-y-6">
           <div className="relative">
-            <span className="absolute left-4 top-3.5 text-gray-500 font-bold">Rp</span>
+            <span className="absolute left-4 top-3.5 text-muted-foreground font-bold">Rp</span>
             <input
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold"
+              className="w-full pl-12 pr-4 py-3 border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-ring text-lg font-semibold bg-background text-foreground"
               placeholder="0"
               required
               min="10000"
@@ -65,7 +65,7 @@ export default function MerchantDashboard() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg transition-colors disabled:bg-gray-400"
+            className="w-full bg-primary hover:opacity-90 text-primary-foreground font-bold py-4 rounded-lg transition-colors disabled:bg-muted disabled:text-muted-foreground"
           >
             {loading ? 'Memproses...' : 'Buat QR Code'}
           </button>

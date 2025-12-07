@@ -1,12 +1,17 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { cookies } from '../../lib/cookies'
+import { api } from '../../lib/axios.instance'
 
 interface User {
     id: string
     name: string
     email: string
     balanceIDR: string
+    bankName?: string | null
+    bankAccount?: string | null
+    createdAt?: string
+    updatedAt?: string
 }
 
 interface AuthState {
@@ -15,6 +20,9 @@ interface AuthState {
     login: (user: User, token: string) => void
     logout: () => void
     hydrate: () => void
+    updateBalance: (balanceIDR: string) => void
+    fetchMerchantData: () => Promise<void>
+    isFetching: boolean
 }
 
 export const useAuth = create<AuthState>()(
@@ -43,6 +51,49 @@ export const useAuth = create<AuthState>()(
                     else if (!tokenFromCookie && currentState.token) {
                         set({ user: null, token: null })
                     }
+                }
+            },
+
+            updateBalance: (balanceIDR: string) => {
+                const currentState = get()
+                if (currentState.user) {
+                    set({
+                        user: {
+                            ...currentState.user,
+                            balanceIDR: balanceIDR
+                        }
+                    })
+                }
+            },
+
+            isFetching: false,
+
+            fetchMerchantData: async () => {
+                const currentState = get()
+                if (!currentState.token || !currentState.user) {
+                    return
+                }
+
+                // Prevent multiple simultaneous fetches
+                if (currentState.isFetching) {
+                    return
+                }
+
+                set({ isFetching: true })
+
+                try {
+                    const merchantData = await api.get<User>('/merchant/me')
+
+                    set({
+                        user: {
+                            ...merchantData,
+                            balanceIDR: merchantData.balanceIDR || currentState.user.balanceIDR
+                        },
+                        isFetching: false
+                    })
+                } catch (err) {
+                    console.error('Failed to fetch merchant data:', err)
+                    set({ isFetching: false })
                 }
             },
         }),

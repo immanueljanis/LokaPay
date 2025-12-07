@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { MerchantSyncProvider } from "../components/MerchantSyncProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -18,11 +19,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="light">
       <body
-        className={`${inter.variable} antialiased`}
+        className={`${inter.variable} antialiased bg-background`}
       >
-        {children}
+        <MerchantSyncProvider>
+          {children}
+        </MerchantSyncProvider>
       </body>
     </html>
   );
