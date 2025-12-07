@@ -11,7 +11,12 @@ import { successResponse, errorResponse } from './utils/response'
 import { generateToken } from './utils/jwt'
 import { authMiddleware } from './middleware/auth'
 
-const app = new Hono()
+// Define Hono context variables type
+type Variables = {
+    merchant: { merchantId: string; email: string }
+}
+
+const app = new Hono<{ Variables: Variables }>()
 
 // 1. Middleware Global
 app.use('*', logger()) // Agar log request muncul di terminal
@@ -147,9 +152,9 @@ app.post('/auth/login', async (c) => {
     }
 })
 
-// Endpoint Get Current Merchant Data (Protected - requires auth)
 app.get('/merchant/me', authMiddleware, async (c) => {
     try {
+        // Get merchant from context (set by authMiddleware)
         const merchant = c.get('merchant')
         if (!merchant) {
             return errorResponse(c, 'Unauthorized', 401)
@@ -206,9 +211,12 @@ app.post('/transaction/create', authMiddleware, async (c) => {
             return errorResponse(c, 'Failed to get exchange rate', 500)
         }
 
-        const rawUSDT = data.amountIDR / rate
-        const spread = rawUSDT * 0.015
-        const finalUSDT = rawUSDT + spread
+        // Hitung semua nilai yang diperlukan
+        const amountInvoice = data.amountIDR
+        const rawUSDT = amountInvoice / rate
+        const spreadUSDT = rawUSDT * 0.015
+        const finalUSDT = rawUSDT + spreadUSDT
+        const feeApp = amountInvoice * 0.015 // Fee aplikasi 1.5% dari invoice
 
         // B. Generate Salt & Address
         const invoiceUUID = crypto.randomUUID()
@@ -219,19 +227,22 @@ app.post('/transaction/create', authMiddleware, async (c) => {
         const factory = getFactoryContract()
         const predictedAddress = await (factory.getVaultAddress as (salt: string, owner: string) => Promise<string>)(salt, relayerSigner.address)
 
-        // C. Simpan ke DB (Update field baru)
+        // C. Simpan ke DB dengan semua field yang sudah dihitung
         const transaction = await prisma.transaction.create({
             data: {
                 merchantId: data.merchantId,
-                amountIDR: data.amountIDR,
+                // Field baru
+                amountInvoice: amountInvoice,
                 amountUSDT: finalUSDT,
                 exchangeRate: rate,
+                amountReceivedUSDT: 0,
+                amountReceivedIdr: 0,
+                tipIdr: 0,
+                feeApp: feeApp,
                 network: "MANTLE",
-
                 paymentAddress: predictedAddress,
                 salt: salt,
                 isDeployed: false,
-
                 expiresAt: new Date(Date.now() + 5 * 60 * 1000)
             }
         })
@@ -240,11 +251,12 @@ app.post('/transaction/create', authMiddleware, async (c) => {
             c,
             {
                 invoiceId: transaction.id,
-                amountIDR: data.amountIDR,
+                amountInvoice: amountInvoice,
                 amountUSDT: finalUSDT.toFixed(4),
-                rateUsed: rate,
+                exchangeRate: rate,
+                feeApp: feeApp,
                 paymentAddress: predictedAddress,
-                expiresIn: '5 minutes'
+                expiresIn: '5 minutes',
             },
             'Invoice created',
             201
@@ -298,7 +310,8 @@ app.post('/webhook/tatum', async (c) => {
         const now = new Date()
         const isExpired = now > transaction.expiresAt
 
-        // Default: Gunakan data lama
+        // Ambil data invoice
+        const invoiceAmount = parseFloat(transaction.amountInvoice.toString())
         let expectedUSDT = parseFloat(transaction.amountUSDT.toString())
         let finalRate = parseFloat(transaction.exchangeRate.toString())
         let isRateUpdated = false
@@ -308,9 +321,8 @@ app.post('/webhook/tatum', async (c) => {
             const currentRate = await getRealExchangeRate()
 
             if (currentRate) {
-                const idrAmount = parseFloat(transaction.amountIDR.toString())
                 // Hitung ulang kebutuhan USDT dengan rate baru + spread 1.5%
-                const newCalculatedUSDT = (idrAmount / currentRate) * 1.015
+                const newCalculatedUSDT = (invoiceAmount / currentRate) * 1.015
 
                 // Hanya update jika rate turun (butuh lebih banyak USDT)
                 // Jika rate naik (USDT menguat), merchant untung spread lebih, biarkan tagihan lama.
@@ -324,31 +336,49 @@ app.post('/webhook/tatum', async (c) => {
         }
 
         // --- LOGIC AKUMULASI ---
-        const currentReceived = parseFloat(transaction.amountReceived.toString())
-        const totalReceived = currentReceived + incomingAmount
+        const currentReceivedUSDT = parseFloat(transaction.amountReceivedUSDT.toString())
+        const totalReceivedUSDT = currentReceivedUSDT + incomingAmount
 
         let newStatus = transaction.status
 
-        if (totalReceived < (expectedUSDT - 0.0001)) {
+        if (totalReceivedUSDT < (expectedUSDT - 0.0001)) {
             newStatus = 'PARTIALLY_PAID'
-        } else if (totalReceived > (expectedUSDT + 0.1)) {
+        } else if (totalReceivedUSDT > (expectedUSDT + 0.1)) {
             newStatus = 'OVERPAID'
         } else {
             newStatus = 'PAID'
         }
 
+        // Hitung semua nilai yang diperlukan
+        const amountReceivedIdr = Math.floor(totalReceivedUSDT * finalRate)
+
+        // Hitung feeApp (1.5% dari invoice) - tetap sama meskipun rate berubah
+        const feeApp = invoiceAmount * 0.015
+
+        // Hitung tip jika overpaid
+        let tipIdr = 0
+        if (newStatus === 'OVERPAID') {
+            const excessUSDT = totalReceivedUSDT - expectedUSDT
+            tipIdr = Math.floor(excessUSDT * finalRate)
+        }
+
         // --- UPDATE DATABASE ATOMIC ---
         await prisma.$transaction(async (tx) => {
-            // Update Transaction
+            // Update Transaction dengan semua field yang sudah dihitung
             await tx.transaction.update({
                 where: { id: transaction.id },
                 data: {
                     status: newStatus,
-                    amountReceived: { increment: incomingAmount },
+                    // Field Payment Received
+                    amountReceivedUSDT: totalReceivedUSDT,
+                    amountReceivedIdr: amountReceivedIdr,
+                    // Field Breakdown
+                    tipIdr: tipIdr,
+                    feeApp: feeApp, // Fee tetap 1.5% dari invoice
                     // Jika ada penyesuaian rate karena telat, update juga
                     amountUSDT: isRateUpdated ? expectedUSDT : undefined,
                     exchangeRate: isRateUpdated ? finalRate : undefined,
-
+                    // Blockchain
                     txHash: (newStatus === 'PAID' || newStatus === 'OVERPAID') ? txHash : undefined,
                     confirmedAt: (newStatus === 'PAID' || newStatus === 'OVERPAID') ? new Date() : undefined,
                 }
@@ -359,22 +389,15 @@ app.post('/webhook/tatum', async (c) => {
             const wasNotFinal = transaction.status !== 'PAID' && transaction.status !== 'OVERPAID'
 
             if (isFinal && wasNotFinal) {
-                let creditIDR = parseFloat(transaction.amountIDR.toString())
-
-                // Hitung Tip (Overpaid)
-                if (newStatus === 'OVERPAID') {
-                    // Gunakan rate final (bisa lama atau baru)
-                    const excessUSDT = totalReceived - expectedUSDT
-                    const excessIDR = Math.floor(excessUSDT * finalRate)
-                    creditIDR += excessIDR
-                    console.log(`🤑 Tip Detected: ${excessUSDT} USDT -> Rp ${excessIDR}`)
-                }
+                // Merchant menerima invoiceAmount (tagihan asli) + tip jika ada
+                const invoiceValue = parseFloat(transaction.amountInvoice.toString())
+                let creditIDR = invoiceValue + tipIdr
 
                 await tx.merchant.update({
                     where: { id: transaction.merchantId },
                     data: { balanceIDR: { increment: creditIDR } }
                 })
-                console.log(`💰 Merchant Credited: Rp ${creditIDR}`)
+                console.log(`💰 Merchant Credited: Rp ${creditIDR} (Invoice: ${invoiceValue} + Tip: ${tipIdr})`)
             }
         })
 
@@ -387,6 +410,7 @@ app.post('/webhook/tatum', async (c) => {
 
 app.get('/transaction/:id', authMiddleware, async (c) => {
     const id = c.req.param('id')
+    const merchant = c.get('merchant')
 
     const transaction = await prisma.transaction.findUnique({
         where: { id }
@@ -396,29 +420,43 @@ app.get('/transaction/:id', authMiddleware, async (c) => {
         return errorResponse(c, 'Transaction not found', 404)
     }
 
+    const transactionMerchantId = String(transaction.merchantId)
+    const tokenMerchantId = String(merchant.merchantId)
+
+    if (transactionMerchantId !== tokenMerchantId) {
+        return errorResponse(c, 'Forbidden: You can only access your own transactions', 403)
+    }
+
     return successResponse(c, transaction, 'Transaction retrieved successfully')
 })
 
 app.get('/merchant/:id/dashboard', authMiddleware, async (c) => {
     const id = c.req.param('id')
+    const merchant = c.get('merchant')
+
+    const routeMerchantId = String(id)
+    const tokenMerchantId = String(merchant.merchantId)
+
+    if (routeMerchantId !== tokenMerchantId) {
+        return errorResponse(c, 'Forbidden: You can only access your own data', 403)
+    }
 
     try {
-        const merchant = await prisma.merchant.findUnique({
+        const merchantData = await prisma.merchant.findUnique({
             where: { id },
             include: {
                 transactions: {
-                    orderBy: { createdAt: 'desc' }, // Urutkan dari yang terbaru
-                    take: 20 // Ambil 20 terakhir saja biar ringan
+                    orderBy: { createdAt: 'desc' },
+                    take: 20
                 }
             }
         })
 
-        if (!merchant) {
+        if (!merchantData) {
             return errorResponse(c, 'Merchant not found', 404)
         }
 
-        // Return data yang aman (hapus passwordHash)
-        const { passwordHash, ...safeMerchant } = merchant
+        const { passwordHash, ...safeMerchant } = merchantData
         return successResponse(c, safeMerchant, 'Merchant dashboard data retrieved successfully')
 
     } catch (e) {
@@ -428,6 +466,7 @@ app.get('/merchant/:id/dashboard', authMiddleware, async (c) => {
 })
 
 // Export untuk Bun
+console.log('🚀 API Server starting on port 3001...')
 export default {
     port: 3001,
     fetch: app.fetch,

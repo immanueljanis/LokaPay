@@ -2,7 +2,11 @@ import type { Context } from 'hono'
 import { verifyToken } from '../utils/jwt'
 import { errorResponse } from '../utils/response'
 
-export async function authMiddleware(c: Context, next: () => Promise<void>) {
+type Variables = {
+    merchant: { merchantId: string; email: string }
+}
+
+export async function authMiddleware(c: Context<{ Variables: Variables }>, next: () => Promise<void>) {
     try {
         const authHeader = c.req.header('Authorization')
 
@@ -17,11 +21,6 @@ export async function authMiddleware(c: Context, next: () => Promise<void>) {
             return errorResponse(c, 'Unauthorized: Invalid or expired token', 401)
         }
         c.set('merchant', payload)
-
-        const merchantIdFromRoute = c.req.param('id')
-        if (merchantIdFromRoute && payload.merchantId !== merchantIdFromRoute) {
-            return errorResponse(c, 'Forbidden: You can only access your own data', 403)
-        }
 
         await next()
     } catch (error) {

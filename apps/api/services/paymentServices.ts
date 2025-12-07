@@ -10,9 +10,8 @@ export async function processIncomingPayment(address: string, amount: number, tx
         }
     })
 
-    if (!transaction) return // Skip jika tidak ada tagihan pending
+    if (!transaction) return
 
-    // --- LOGIC LATE PAYMENT (Sama seperti sebelumnya) ---
     const now = new Date()
     const isExpired = now > transaction.expiresAt
     let expectedUSDT = parseFloat(transaction.amountUSDT.toString())
@@ -21,20 +20,17 @@ export async function processIncomingPayment(address: string, amount: number, tx
 
     if (isExpired) {
         console.log(`⚠️ Late Payment! ID: ${transaction.id}`)
-        // (Masukkan logic recalculate rate disini jika mau, atau skip untuk MVP)
     }
 
-    // --- LOGIC AKUMULASI ---
-    const currentReceived = parseFloat(transaction.amountReceived.toString())
-    const totalReceived = currentReceived + amount
+    const currentReceivedUSDT = parseFloat(transaction.amountReceivedUSDT.toString())
+    const totalReceivedUSDT = currentReceivedUSDT + amount
 
     let newStatus = transaction.status
 
-    // Toleransi floating point
-    if (totalReceived < (expectedUSDT - 0.0001)) {
+    if (totalReceivedUSDT < (expectedUSDT - 0.0001)) {
         newStatus = 'PARTIALLY_PAID'
         console.log(`🟡 Partial Payment`)
-    } else if (totalReceived > (expectedUSDT + 0.1)) {
+    } else if (totalReceivedUSDT > (expectedUSDT + 0.1)) {
         newStatus = 'OVERPAID'
         console.log(`🟢 Overpaid (Tip)`)
     } else {
@@ -42,41 +38,44 @@ export async function processIncomingPayment(address: string, amount: number, tx
         console.log(`✅ Paid Lunas`)
     }
 
-    // --- UPDATE DB (Hanya update jika ada progress) ---
-    if (totalReceived > currentReceived) {
+    const amountReceivedIdr = Math.floor(totalReceivedUSDT * finalRate)
+    const amountInvoice = parseFloat(transaction.amountInvoice.toString())
+    const feeApp = amountInvoice * 0.015
+
+    let tipIdr = 0
+    if (newStatus === 'OVERPAID') {
+        const excessUSDT = totalReceivedUSDT - expectedUSDT
+        tipIdr = Math.floor(excessUSDT * finalRate)
+    }
+
+    if (totalReceivedUSDT > currentReceivedUSDT) {
         await prisma.$transaction(async (tx) => {
-            // Update Transaction
             await tx.transaction.update({
                 where: { id: transaction.id },
                 data: {
                     status: newStatus,
-                    amountReceived: { increment: amount }, // Tambah saldo baru
+                    amountReceivedUSDT: totalReceivedUSDT,
+                    amountReceivedIdr: amountReceivedIdr,
+                    tipIdr: tipIdr,
+                    feeApp: feeApp,
                     amountUSDT: isRateUpdated ? expectedUSDT : undefined,
                     exchangeRate: isRateUpdated ? finalRate : undefined,
-                    // Kalau polling, kita mungkin gak punya txHash akurat per transfer, 
-                    // tapi gak masalah untuk MVP.
                     txHash: txHash,
                     confirmedAt: (newStatus === 'PAID' || newStatus === 'OVERPAID') ? new Date() : undefined,
                 }
             })
 
-            // Update Merchant Balance
             const isFinal = newStatus === 'PAID' || newStatus === 'OVERPAID'
             const wasNotFinal = transaction.status !== 'PAID' && transaction.status !== 'OVERPAID'
 
             if (isFinal && wasNotFinal) {
-                let creditIDR = parseFloat(transaction.amountIDR.toString())
-                if (newStatus === 'OVERPAID') {
-                    const excessUSDT = totalReceived - expectedUSDT
-                    const excessIDR = Math.floor(excessUSDT * finalRate)
-                    creditIDR += excessIDR
-                }
+                let creditIDR = amountInvoice + tipIdr
 
                 await tx.merchant.update({
                     where: { id: transaction.merchantId },
                     data: { balanceIDR: { increment: creditIDR } }
                 })
-                console.log(`💰 Merchant Credited: Rp ${creditIDR}`)
+                console.log(`💰 Merchant Credited: Rp ${creditIDR} (Invoice: ${amountInvoice} + Tip: ${tipIdr})`)
             }
         })
     }
