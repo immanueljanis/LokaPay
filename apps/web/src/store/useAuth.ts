@@ -70,7 +70,7 @@ export const useAuth = create<AuthState>()(
 
             fetchMerchantData: async () => {
                 const currentState = get()
-                if (!currentState.token || !currentState.user) {
+                if (!currentState.token) {
                     return
                 }
 
@@ -83,12 +83,8 @@ export const useAuth = create<AuthState>()(
 
                 try {
                     const merchantData = await api.get<User>('/merchant/me')
-
                     set({
-                        user: {
-                            ...merchantData,
-                            balanceIDR: merchantData.balanceIDR || currentState.user.balanceIDR
-                        },
+                        user: merchantData,
                         isFetching: false
                     })
                 } catch (err) {

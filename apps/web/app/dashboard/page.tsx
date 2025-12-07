@@ -1,17 +1,29 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { FileText } from 'lucide-react'
 import { api } from '../../lib/axios.instance'
 import { useAuth } from '../../src/store/useAuth'
 import ProtectedRoute from '../../components/ProtectedRoute'
 import { DashboardLayout } from '../../components/DashboardLayout'
+import { CreateInvoiceModal } from '../../components/dashboard/CreateInvoiceModal'
+import { Button } from '@/components/ui/button'
+import { TipBadge } from '@/components/common/TipBadge'
 
-// Tipe Data untuk TypeScript
+// Tipe Data untuk Transaction
 type Transaction = {
     id: string
-    amountIDR: string
-    amountReceived: string
+    // Field Invoice
+    amountInvoice: string | number
+    amountUSDT: string | number
+    exchangeRate: string | number
+    // Field Payment Received
+    amountReceivedUSDT: string | number
+    amountReceivedIdr: string | number
+    // Field Breakdown
+    tipIdr: string | number
+    feeApp: string | number
     status: string
     createdAt: string
 }
@@ -24,8 +36,7 @@ type DashboardData = {
 }
 
 export default function DashboardPage() {
-    const router = useRouter()
-    const { user, logout, updateBalance } = useAuth() // Ambil user dari session login
+    const { user } = useAuth()
 
     const [data, setData] = useState<DashboardData | null>(null)
     const [loading, setLoading] = useState(true)
@@ -51,14 +62,13 @@ export default function DashboardPage() {
         }
 
         fetchData()
-        // Refresh data tiap 30 detik (Polling untuk update transaksi)
         const interval = setInterval(fetchData, 30000)
 
         return () => {
             mounted = false
             clearInterval(interval)
         }
-    }, [user?.id]) // Hanya depend pada user.id, bukan seluruh user object
+    }, [user?.id])
 
     return (
         <ProtectedRoute>
@@ -85,15 +95,24 @@ export default function DashboardPage() {
                                     Rp {parseInt(data.balanceIDR).toLocaleString('id-ID')}
                                 </h2>
                                 <div className="mt-6 flex gap-3">
-                                    <button
-                                        onClick={() => router.push('/')}
-                                        className="bg-background text-primary px-6 py-2 rounded-lg font-bold hover:bg-secondary transition shadow"
+                                    <CreateInvoiceModal
+                                        trigger={
+                                            <Button
+                                                variant="outline"
+                                                size="lg"
+                                                className="bg-background text-primary px-6 py-2 rounded-lg font-bold hover:bg-secondary hover:text-primary transition-all shadow-md hover:shadow-lg"
+                                            >
+                                                + Buat Tagihan Baru
+                                            </Button>
+                                        }
+                                    />
+                                    <Button
+                                        variant="outline"
+                                        size="lg"
+                                        className="bg-accent text-accent-foreground px-6 py-2 rounded-lg font-bold hover:bg-accent/90 hover:text-accent-foreground transition-all border border-accent shadow-md hover:shadow-lg"
                                     >
-                                        + Buat Tagihan Baru
-                                    </button>
-                                    <button className="bg-accent text-accent-foreground px-6 py-2 rounded-lg font-medium hover:opacity-90 transition border border-accent">
                                         Tarik Saldo
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
 
@@ -106,30 +125,51 @@ export default function DashboardPage() {
                                     <table className="w-full text-sm text-left">
                                         <thead className="bg-muted text-muted-foreground">
                                             <tr>
+                                                <th className="px-6 py-3">ID</th>
                                                 <th className="px-6 py-3">Waktu</th>
                                                 <th className="px-6 py-3">Tagihan (IDR)</th>
                                                 <th className="px-6 py-3">Terima (IDR)</th>
                                                 <th className="px-6 py-3">Status</th>
+                                                <th className="px-6 py-3 text-center">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {data.transactions.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">
+                                                    <td colSpan={6} className="px-6 py-8 text-center text-muted-foreground">
                                                         Belum ada transaksi. Ayo mulai jualan!
                                                     </td>
                                                 </tr>
                                             ) : (
                                                 data.transactions.map((tx) => (
                                                     <tr key={tx.id} className="border-b last:border-0 hover:bg-muted/50">
+                                                        <td className="px-6 py-4 text-muted-foreground font-mono text-xs">
+                                                            {tx.id.slice(0, 8)}...
+                                                        </td>
                                                         <td className="px-6 py-4 text-muted-foreground">
                                                             {new Date(tx.createdAt).toLocaleString('id-ID')}
                                                         </td>
                                                         <td className="px-6 py-4 font-medium text-card-foreground">
-                                                            Rp {parseInt(tx.amountIDR).toLocaleString()}
+                                                            Rp {Math.floor(parseFloat(tx?.amountInvoice?.toString() || '0')).toLocaleString('id-ID')}
                                                         </td>
                                                         <td className="px-6 py-4 font-medium text-card-foreground">
-                                                            Rp {parseInt(tx.amountReceived || '0').toLocaleString()}
+                                                            {(() => {
+                                                                const amountInvoice = parseFloat(tx.amountInvoice.toString())
+                                                                const tipIdr = parseFloat(tx.tipIdr.toString())
+
+                                                                if (tx.status === 'PENDING' || tx.status === 'PARTIALLY_PAID') {
+                                                                    return 'Rp 0'
+                                                                }
+
+                                                                // Merchant menerima amountInvoice + tip jika overpaid
+                                                                const merchantReceived = amountInvoice + tipIdr
+                                                                return (
+                                                                    <div className="flex items-center gap-1">
+                                                                        <span>Rp {Math.floor(merchantReceived).toLocaleString('id-ID')}</span>
+                                                                        <TipBadge tipIdr={tipIdr} />
+                                                                    </div>
+                                                                )
+                                                            })()}
                                                         </td>
                                                         <td className="px-6 py-4">
                                                             <span className={`px-2 py-1 rounded-full text-xs font-bold ${tx.status === 'PAID' || tx.status === 'OVERPAID'
@@ -140,6 +180,18 @@ export default function DashboardPage() {
                                                                 }`}>
                                                                 {tx.status}
                                                             </span>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-center">
+                                                            <Link href={`/invoice/${tx.id}`}>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    className="hover:bg-primary/10 hover:text-primary transition-colors"
+                                                                    title="Lihat Invoice"
+                                                                >
+                                                                    <FileText className="h-4 w-4" />
+                                                                </Button>
+                                                            </Link>
                                                         </td>
                                                     </tr>
                                                 ))
