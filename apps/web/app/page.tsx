@@ -1,13 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import { api } from '../lib/axios.instance'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../src/store/useAuth'
 
 export default function MerchantDashboard() {
   const router = useRouter()
-  const { user } = useAuth() // Ambil user dari login
+  const { user } = useAuth()
   const [amount, setAmount] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -17,20 +17,19 @@ export default function MerchantDashboard() {
     }
   }, [user, router])
 
-  if (!user) return null // Jangan render apa-apa sebelum redirect
+  if (!user) return null
 
   const handleCreateInvoice = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
     try {
-      // Panggil API dengan ID Merchant yang dinamis
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/transaction/create`, {
-        merchantId: user.id, // <--- DINAMIS DARI SINI
+      const responseData = await api.post<{ invoiceId: string }>('/transaction/create', {
+        merchantId: user.id,
         amountIDR: parseFloat(amount)
       })
 
-      const invoiceId = response.data.data.invoiceId
+      const invoiceId = responseData.invoiceId
       router.push(`/invoice/${invoiceId}`)
 
     } catch (error) {
@@ -41,21 +40,16 @@ export default function MerchantDashboard() {
     }
   }
 
-  // ... (Sisa kode tampilan form tetap sama, cuma tambahkan Tombol "Kembali ke Dashboard" di pojok)
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-      {/* Tambahkan tombol kecil di atas */}
       <div className="absolute top-4 left-4">
         <button onClick={() => router.push('/dashboard')} className="text-blue-600 hover:underline">
           &larr; Kembali ke Dashboard
         </button>
       </div>
 
-      {/* ... Form Input Rupiah (Sama seperti sebelumnya) ... */}
       <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
-        {/* ... kode form ... */}
         <form onSubmit={handleCreateInvoice} className="space-y-6">
-          {/* ... input amount ... */}
           <div className="relative">
             <span className="absolute left-4 top-3.5 text-gray-500 font-bold">Rp</span>
             <input

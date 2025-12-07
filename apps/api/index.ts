@@ -7,6 +7,8 @@ import { getRealExchangeRate } from './utils/rate'
 import { getFactoryContract, relayerSigner } from './constants/contracts'
 import { ethers } from 'ethers'
 import { createHmac } from 'crypto'
+import { successResponse, errorResponse } from './utils/response'
+import { generateToken } from './utils/jwt'
 
 const app = new Hono()
 
@@ -35,7 +37,7 @@ const createTransactionSchema = z.object({
 
 // 3. Endpoint Hello World (Cek Server)
 app.get('/', (c) => {
-    return c.json({ message: 'LokaPay API is Running! 🚀' })
+    return successResponse(c, { status: 'running' }, 'LokaPay API is Running! 🚀')
 })
 
 // 4. Endpoint Register Merchant
@@ -53,7 +55,7 @@ app.post('/auth/register', async (c) => {
         })
 
         if (existingUser) {
-            return c.json({ error: 'Email already registered' }, 400)
+            return errorResponse(c, 'Email already registered', 400)
         }
 
         // Hash Password (Native Bun - Aman & Cepat)
@@ -71,23 +73,27 @@ app.post('/auth/register', async (c) => {
         })
 
         // Return sukses (tanpa passwordHash)
-        return c.json({
-            message: 'Registration successful',
-            merchant: {
-                id: newMerchant.id,
-                name: newMerchant.name,
-                email: newMerchant.email
-            }
-        }, 201)
+        return successResponse(
+            c,
+            {
+                merchant: {
+                    id: newMerchant.id,
+                    name: newMerchant.name,
+                    email: newMerchant.email
+                }
+            },
+            'Registration successful',
+            201
+        )
 
     } catch (e) {
         // Handle Error Validasi Zod
         if (e instanceof z.ZodError) {
-            return c.json({ error: e.issues }, 400)
+            return errorResponse(c, e.issues[0]?.message || 'Validation error', 400)
         }
         // Handle Error Lainnya
         console.error(e)
-        return c.json({ error: 'Internal Server Error' }, 500)
+        return errorResponse(c, 'Internal Server Error', 500)
     }
 })
 
@@ -102,31 +108,41 @@ app.post('/auth/login', async (c) => {
         })
 
         if (!merchant) {
-            return c.json({ error: 'Email atau password salah' }, 401)
+            return errorResponse(c, 'Email atau password salah', 401)
         }
 
         const isMatch = await Bun.password.verify(data.password, merchant.passwordHash)
 
         if (!isMatch) {
-            return c.json({ error: 'Email atau password salah' }, 401)
+            return errorResponse(c, 'Email atau password salah', 401)
         }
 
-        return c.json({
-            message: 'Login successful',
-            merchant: {
-                id: merchant.id,
-                name: merchant.name,
-                email: merchant.email,
-                balanceIDR: merchant.balanceIDR
-            }
+        // Generate JWT token dengan expiry 8 jam
+        const token = await generateToken({
+            merchantId: merchant.id,
+            email: merchant.email
         })
+
+        return successResponse(
+            c,
+            {
+                merchant: {
+                    id: merchant.id,
+                    name: merchant.name,
+                    email: merchant.email,
+                    balanceIDR: merchant.balanceIDR
+                },
+                token
+            },
+            'Login successful'
+        )
 
     } catch (e) {
         if (e instanceof z.ZodError) {
-            return c.json({ error: e.issues[0]?.message }, 400)
+            return errorResponse(c, e.issues[0]?.message || 'Validation error', 400)
         }
         console.error(e)
-        return c.json({ error: 'Internal Server Error' }, 500)
+        return errorResponse(c, 'Internal Server Error', 500)
     }
 })
 
@@ -139,7 +155,7 @@ app.post('/transaction/create', async (c) => {
         // A. Ambil Rate (Tetap sama)
         const rate = await getRealExchangeRate()
         if (!rate) {
-            return c.json({ error: 'Failed to get exchange rate' }, 500)
+            return errorResponse(c, 'Failed to get exchange rate', 500)
         }
 
         const rawUSDT = data.amountIDR / rate
@@ -172,22 +188,26 @@ app.post('/transaction/create', async (c) => {
             }
         })
 
-        return c.json({
-            message: 'Invoice created',
-            data: {
+        return successResponse(
+            c,
+            {
                 invoiceId: transaction.id,
                 amountIDR: data.amountIDR,
                 amountUSDT: finalUSDT.toFixed(4),
                 rateUsed: rate,
                 paymentAddress: predictedAddress,
                 expiresIn: '5 minutes'
-            }
-        }, 201)
+            },
+            'Invoice created',
+            201
+        )
 
     } catch (e) {
-        if (e instanceof z.ZodError) return c.json({ error: e.issues }, 400)
+        if (e instanceof z.ZodError) {
+            return errorResponse(c, e.issues[0]?.message || 'Validation error', 400)
+        }
         console.error(e)
-        return c.json({ error: 'Transaction Failed' }, 500)
+        return errorResponse(c, 'Transaction Failed', 500)
     }
 })
 
@@ -325,9 +345,11 @@ app.get('/transaction/:id', async (c) => {
         where: { id }
     })
 
-    if (!transaction) return c.json({ error: 'Not found' }, 404)
+    if (!transaction) {
+        return errorResponse(c, 'Transaction not found', 404)
+    }
 
-    return c.json({ data: transaction })
+    return successResponse(c, transaction, 'Transaction retrieved successfully')
 })
 
 // 6. Endpoint Get Merchant Dashboard (Profile + History)
@@ -345,15 +367,17 @@ app.get('/merchant/:id/dashboard', async (c) => {
             }
         })
 
-        if (!merchant) return c.json({ error: 'Merchant not found' }, 404)
+        if (!merchant) {
+            return errorResponse(c, 'Merchant not found', 404)
+        }
 
         // Return data yang aman (hapus passwordHash)
         const { passwordHash, ...safeMerchant } = merchant
-        return c.json({ data: safeMerchant })
+        return successResponse(c, safeMerchant, 'Merchant dashboard data retrieved successfully')
 
     } catch (e) {
         console.error(e)
-        return c.json({ error: 'Server error' }, 500)
+        return errorResponse(c, 'Server error', 500)
     }
 })
 

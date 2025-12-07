@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import axios from 'axios'
+import { api } from '../../lib/axios.instance'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../../src/store/useAuth'
 
@@ -20,22 +20,24 @@ export default function LoginPage() {
         setError('')
 
         try {
-            // 1. Tembak API Backend
-            const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+            const responseData = await api.post<{ merchant: any; token: string }>('/auth/login', {
                 email,
                 password
             })
 
-            // 2. Simpan data user ke Global Store (Persist di LocalStorage)
-            // Data ini yang nanti dibaca oleh Dashboard & Halaman Create Invoice
-            login(res.data.merchant)
+            const merchant = responseData?.merchant
+            const token = responseData?.token || ''
 
-            // 3. Redirect ke Dashboard
-            router.push('/dashboard')
+            if (merchant && token) {
+                login(merchant, token)
+                router.push('/dashboard')
+            } else {
+                setError('Response tidak valid dari server')
+            }
 
         } catch (err: any) {
-            // Handle Error dari Backend
-            const msg = err.response?.data?.error || 'Gagal login. Cek koneksi.'
+            // Error format: { success: false, message: string, data: null }
+            const msg = err.response?.data?.message || err.message || 'Gagal login. Cek koneksi.'
             setError(msg)
         } finally {
             setLoading(false)

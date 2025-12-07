@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, use } from 'react' // Import 'use' untuk params di Next 15/14
-import axios from 'axios'
+import { api } from '../../../lib/axios.instance'
 import QRCode from 'react-qr-code'
 
 // Tipe Data Transaksi
@@ -20,13 +20,10 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
     const [tx, setTx] = useState<Transaction | null>(null)
     const [loading, setLoading] = useState(true)
 
-    // 1. Fungsi Fetch Data
     const fetchStatus = async () => {
         try {
-            // Kita butuh endpoint GET /transaction/:id di backend (Belum ada, nanti kita buat!)
-            // Sementara kita pakai endpoint dummy atau perlu buat endpoint detail dulu di API
-            const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/transaction/${id}`)
-            setTx(res.data.data)
+            const transaction = await api.get<Transaction>(`/transaction/${id}`)
+            setTx(transaction)
         } catch (err) {
             console.error("Error polling:", err)
         } finally {
@@ -34,9 +31,8 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
         }
     }
 
-    // 2. Polling Effect (Jalan setiap 3 detik)
     useEffect(() => {
-        fetchStatus() // Fetch pertama
+        fetchStatus()
         const interval = setInterval(fetchStatus, 3000) // Ulangi tiap 3 detik
         return () => clearInterval(interval) // Cleanup
     }, [id])
