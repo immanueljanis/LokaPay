@@ -147,6 +147,53 @@ app.post('/auth/login', async (c) => {
     }
 })
 
+// Endpoint Get Current Merchant Data (Protected - requires auth)
+app.get('/merchant/me', authMiddleware, async (c) => {
+    try {
+        const merchant = c.get('merchant')
+        if (!merchant) {
+            return errorResponse(c, 'Unauthorized', 401)
+        }
+
+        const merchantData = await prisma.merchant.findUnique({
+            where: { id: merchant.merchantId },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                balanceIDR: true,
+                bankName: true,
+                bankAccount: true,
+                createdAt: true,
+                updatedAt: true,
+            }
+        })
+
+        if (!merchantData) {
+            return errorResponse(c, 'Merchant not found', 404)
+        }
+
+        return successResponse(
+            c,
+            {
+                id: merchantData.id,
+                name: merchantData.name,
+                email: merchantData.email,
+                balanceIDR: merchantData.balanceIDR.toString(),
+                bankName: merchantData.bankName,
+                bankAccount: merchantData.bankAccount,
+                createdAt: merchantData.createdAt,
+                updatedAt: merchantData.updatedAt,
+            },
+            'Merchant data retrieved successfully'
+        )
+
+    } catch (e) {
+        console.error(e)
+        return errorResponse(c, 'Internal Server Error', 500)
+    }
+})
+
 // Endpoint Create Transaction (Protected - requires auth)
 app.post('/transaction/create', authMiddleware, async (c) => {
     try {
@@ -338,7 +385,6 @@ app.post('/webhook/tatum', async (c) => {
     }
 })
 
-// 5. Endpoint Get Detail Transaksi (Protected - requires auth)
 app.get('/transaction/:id', authMiddleware, async (c) => {
     const id = c.req.param('id')
 
@@ -353,7 +399,6 @@ app.get('/transaction/:id', authMiddleware, async (c) => {
     return successResponse(c, transaction, 'Transaction retrieved successfully')
 })
 
-// 6. Endpoint Get Merchant Dashboard (Protected - requires auth)
 app.get('/merchant/:id/dashboard', authMiddleware, async (c) => {
     const id = c.req.param('id')
 
