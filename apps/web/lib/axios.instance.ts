@@ -46,7 +46,10 @@ axiosInstance.interceptors.response.use(
 
             switch (status) {
                 case 401:
-                    if (typeof window !== 'undefined') {
+                    const requestUrl = error.config?.url || ''
+                    const isLoginEndpoint = requestUrl.includes('/auth/login')
+
+                    if (typeof window !== 'undefined' && !isLoginEndpoint) {
                         cookies.remove('lokapay-token')
                         localStorage.removeItem('lokapay-session')
                         window.location.href = '/login'

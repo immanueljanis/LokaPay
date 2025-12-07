@@ -9,6 +9,7 @@ import { ethers } from 'ethers'
 import { createHmac } from 'crypto'
 import { successResponse, errorResponse } from './utils/response'
 import { generateToken } from './utils/jwt'
+import { authMiddleware } from './middleware/auth'
 
 const app = new Hono()
 
@@ -146,8 +147,8 @@ app.post('/auth/login', async (c) => {
     }
 })
 
-// Endpoint Create Transaction
-app.post('/transaction/create', async (c) => {
+// Endpoint Create Transaction (Protected - requires auth)
+app.post('/transaction/create', authMiddleware, async (c) => {
     try {
         const body = await c.req.json()
         const data = createTransactionSchema.parse(body)
@@ -337,8 +338,8 @@ app.post('/webhook/tatum', async (c) => {
     }
 })
 
-// 5. Endpoint Get Detail Transaksi
-app.get('/transaction/:id', async (c) => {
+// 5. Endpoint Get Detail Transaksi (Protected - requires auth)
+app.get('/transaction/:id', authMiddleware, async (c) => {
     const id = c.req.param('id')
 
     const transaction = await prisma.transaction.findUnique({
@@ -352,8 +353,8 @@ app.get('/transaction/:id', async (c) => {
     return successResponse(c, transaction, 'Transaction retrieved successfully')
 })
 
-// 6. Endpoint Get Merchant Dashboard (Profile + History)
-app.get('/merchant/:id/dashboard', async (c) => {
+// 6. Endpoint Get Merchant Dashboard (Protected - requires auth)
+app.get('/merchant/:id/dashboard', authMiddleware, async (c) => {
     const id = c.req.param('id')
 
     try {
