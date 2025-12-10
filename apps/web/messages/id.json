@@ -26,7 +26,17 @@
     "contactAdmin": "Hubungi Admin",
     "loginFailed": "Gagal login. Cek koneksi Anda.",
     "invalidResponse": "Response tidak valid dari server",
-    "signInToManage": "Masuk untuk mengelola bisnis Anda"
+    "signInToManage": "Masuk untuk mengelola bisnis Anda",
+    "register": "Daftar",
+    "name": "Nama Merchant",
+    "bankName": "Nama Bank",
+    "bankAccount": "Nomor Rekening Bank",
+    "selectBank": "Pilih Bank",
+    "signUpToStart": "Daftar untuk mulai menerima pembayaran",
+    "alreadyHaveAccount": "Sudah punya akun?",
+    "registerFailed": "Pendaftaran gagal. Silakan coba lagi.",
+    "registrationSuccess": "Pendaftaran berhasil! Silakan masuk.",
+    "loginSuccess": "Login berhasil! Selamat datang kembali."
   },
   "dashboard": {
     "title": "Dashboard",

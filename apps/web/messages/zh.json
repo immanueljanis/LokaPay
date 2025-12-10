@@ -26,7 +26,17 @@
     "contactAdmin": "联系管理员",
     "loginFailed": "登录失败。请检查您的连接。",
     "invalidResponse": "服务器响应无效",
-    "signInToManage": "登录以管理您的业务"
+    "signInToManage": "登录以管理您的业务",
+    "register": "注册",
+    "name": "商户名称",
+    "bankName": "银行名称",
+    "bankAccount": "银行账号",
+    "selectBank": "选择银行",
+    "signUpToStart": "注册以开始接受付款",
+    "alreadyHaveAccount": "已有账户？",
+    "registerFailed": "注册失败。请重试。",
+    "registrationSuccess": "注册成功！请登录。",
+    "loginSuccess": "登录成功！欢迎回来。"
   },
   "dashboard": {
     "title": "仪表板",

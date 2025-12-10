@@ -26,7 +26,17 @@
     "contactAdmin": "Contact Admin",
     "loginFailed": "Login failed. Check your connection.",
     "invalidResponse": "Invalid response from server",
-    "signInToManage": "Sign in to manage your business"
+    "signInToManage": "Sign in to manage your business",
+    "register": "Register",
+    "name": "Merchant Name",
+    "bankName": "Bank Name",
+    "bankAccount": "Bank Account Number",
+    "selectBank": "Select Bank",
+    "signUpToStart": "Sign up to start accepting payments",
+    "alreadyHaveAccount": "Already have an account?",
+    "registerFailed": "Registration failed. Please try again.",
+    "registrationSuccess": "Registration successful! Please sign in.",
+    "loginSuccess": "Login successful! Welcome back."
   },
   "dashboard": {
     "title": "Dashboard",

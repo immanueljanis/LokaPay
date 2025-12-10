@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 export const dynamic = "force-dynamic";
 
@@ -79,6 +80,7 @@ export default function RootLayout({
         className={`${inter.variable} antialiased bg-background`}
       >
         {children}
+        <Toaster />
       </body>
     </html>
   );
