@@ -64,7 +64,6 @@ Copy file `.env.example` (buat manual jika belum ada) di `apps/api` dan `package
 
 ```env
 DATABASE_URL="postgresql://lokapay_admin:lokapay_password@localhost:5433/lokapay_db?schema=public"
-TATUM_API_KEY="your_tatum_api_key"
 WEBHOOK_BASE_URL="[https://url-ngrok-anda.ngrok-free.app](https://url-ngrok-anda.ngrok-free.app)" 
 RPC_URL="[https://bsc-dataseed.binance.org/](https://bsc-dataseed.binance.org/)"
 # Wallet Pribadi Anda (Penyuplai Bensin)
@@ -119,7 +118,6 @@ Untuk demo atau testing tanpa keluar uang banyak:
 3.  **Simulate Payment (via Postman):**
 
       * Anda tidak perlu transfer USDT beneran untuk tes logika.
-      * Kirim `POST` ke `http://localhost:3001/webhook/tatum`.
       * Body JSON:
         ```json
         {
