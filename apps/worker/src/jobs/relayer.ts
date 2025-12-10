@@ -18,6 +18,9 @@ export async function relayProcessor(job: Job) {
     console.log(`   Target: ${paymentAddress}`);
 
     const relayerBalance = await provider.getBalance(relayerSigner.address);
+    if (relayerBalance < ethers.parseEther("1.0")) {
+        console.warn("⚠️ PERINGATAN: Saldo Gas Relayer Menipis! Segera isi ulang.");
+    }
     const relayerBalanceFormatted = parseFloat(ethers.formatEther(relayerBalance));
     const minGasRequired = 0.01; // Minimum gas dalam native token (MNT/ETH)
 
