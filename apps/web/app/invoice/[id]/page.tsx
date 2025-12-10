@@ -9,6 +9,8 @@ import { TipBadge } from '@/components/common/TipBadge'
 import { Copy, Check } from 'lucide-react'
 import { useTranslations, useLocale } from 'next-intl'
 
+export const dynamic = 'force-dynamic'
+
 // Tipe Data Transaksi
 type Transaction = {
     id: string

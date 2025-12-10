@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '../src/store/useAuth'
 import { useTranslations } from 'next-intl'
 
+export const dynamic = 'force-dynamic'
+
 export default function MerchantDashboard() {
   const router = useRouter()
   const { user } = useAuth()

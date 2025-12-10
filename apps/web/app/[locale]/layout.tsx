@@ -1,9 +1,9 @@
-'use server'
-
 import { notFound } from 'next/navigation'
 import { locales } from '@/i18n'
 import { LocaleProviders } from '../../components/common/LocaleProviders'
 import { FloatingLanguageSwitcher } from '../../components/common/FloatingLanguageSwitcher'
+
+export const dynamic = 'force-dynamic'
 
 export default async function LocaleLayout({
     children,

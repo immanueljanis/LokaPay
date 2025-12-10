@@ -4,6 +4,8 @@ import ProtectedRoute from '../../components/ProtectedRoute'
 import { DashboardLayout } from '../../components/DashboardLayout'
 import { useTranslations } from 'next-intl'
 
+export const dynamic = 'force-dynamic'
+
 export default function InvoicePage() {
     const t = useTranslations('invoice')
     return (

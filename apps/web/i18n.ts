@@ -3,13 +3,14 @@ import { notFound } from 'next/navigation';
 
 export const locales = ['en', 'id', 'zh'] as const;
 export type Locale = (typeof locales)[number];
+export const defaultTimeZone = 'Asia/Jakarta';
 
 export const defaultLocales: Record<string, Locale> = {
-    '/dashboard': 'id', // merchant area default Indonesian
-    '/account': 'id',   // merchant area default Indonesian
-    '/login': 'id',     // login default Indonesian
-    '/invoice': 'id',   // merchant invoice list default Indonesian
-    '/': 'id'           // root default Indonesian
+    '/dashboard': 'id',
+    '/account': 'id',
+    '/login': 'id',
+    '/invoice': 'id',
+    '/': 'id'
 };
 
 export default getRequestConfig(async ({ requestLocale }) => {
@@ -22,7 +23,8 @@ export default getRequestConfig(async ({ requestLocale }) => {
 
     return {
         locale,
-        messages: (await import(`./messages/${locale}.json`)).default
+        messages: (await import(`./messages/${locale}.json`)).default,
+        timeZone: defaultTimeZone
     };
 });
 

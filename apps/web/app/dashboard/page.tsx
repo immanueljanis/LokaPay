@@ -12,6 +12,8 @@ import { CreateInvoiceModal } from '../../components/dashboard/CreateInvoiceModa
 import { Button } from '@/components/ui/button'
 import { TipBadge } from '@/components/common/TipBadge'
 
+export const dynamic = 'force-dynamic'
+
 // Tipe Data untuk Transaction
 type Transaction = {
     id: string

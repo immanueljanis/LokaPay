@@ -5,6 +5,8 @@ import { DashboardLayout } from '../../components/DashboardLayout'
 import { useAuth } from '../../src/store/useAuth'
 import { useTranslations, useLocale } from 'next-intl'
 
+export const dynamic = 'force-dynamic'
+
 export default function AccountPage() {
     const { user } = useAuth()
     const t = useTranslations('account')
