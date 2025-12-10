@@ -3,13 +3,14 @@ import { logger } from 'hono/logger'
 import { cors } from 'hono/cors'
 import { z } from 'zod'
 import { prisma } from '@lokapay/database'
-import { getRealExchangeRate } from './utils/rate'
+import { getRealExchangeRate, roundUpTo } from './utils/rate'
 import { getFactoryContract, relayerSigner } from './constants/contracts'
 import { ethers } from 'ethers'
 import { createHmac } from 'crypto'
 import { successResponse, errorResponse } from './utils/response'
 import { generateToken } from './utils/jwt'
 import { authMiddleware } from './middleware/auth'
+import { SPREAD_VALUE, TRANSACTION_FEE } from './constants/value'
 
 // Define Hono context variables type
 type Variables = {
@@ -214,16 +215,15 @@ app.post('/transaction/create', authMiddleware, async (c) => {
         // Hitung semua nilai yang diperlukan
         const amountInvoice = data.amountIDR
         const rawUSDT = amountInvoice / rate
-        const spreadUSDT = rawUSDT * 0.015
-        const finalUSDT = rawUSDT + spreadUSDT
-        const feeApp = amountInvoice * 0.015 // Fee aplikasi 1.5% dari invoice
+        const spreadUSDT = rawUSDT * SPREAD_VALUE
+        const calculatedUSDT = rawUSDT + spreadUSDT
+        const finalUSDT = roundUpTo(calculatedUSDT, 3)
+        const feeApp = amountInvoice * TRANSACTION_FEE
 
         // B. Generate Salt & Address
         const invoiceUUID = crypto.randomUUID()
-        const salt = ethers.id(invoiceUUID) // Convert string ke bytes32
+        const salt = ethers.id(invoiceUUID)
 
-        // Kita tanya ke Factory: "Kalau salt-nya ini, alamatnya nanti apa?"
-        // Owner vault adalah 'relayerSigner' kita (agar nanti backend bisa perintah sweep)
         const factory = getFactoryContract()
         const predictedAddress = await (factory.getVaultAddress as (salt: string, owner: string) => Promise<string>)(salt, relayerSigner.address)
 
@@ -252,7 +252,7 @@ app.post('/transaction/create', authMiddleware, async (c) => {
             {
                 invoiceId: transaction.id,
                 amountInvoice: amountInvoice,
-                amountUSDT: finalUSDT.toFixed(4),
+                amountUSDT: finalUSDT,
                 exchangeRate: rate,
                 feeApp: feeApp,
                 paymentAddress: predictedAddress,

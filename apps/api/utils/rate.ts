@@ -10,3 +10,8 @@ export const getRealExchangeRate = async (): Promise<number | null> => {
         return null
     }
 }
+
+export const roundUpTo = (num: number, decimalPlaces: number) => {
+    const factor = Math.pow(10, decimalPlaces);
+    return Math.ceil(num * factor) / factor;
+};
