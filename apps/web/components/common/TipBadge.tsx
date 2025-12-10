@@ -12,7 +12,7 @@ export function TipBadge({ tipIdr, className = '' }: TipBadgeProps) {
 
     return (
         <span className={`bg-green-500 text-white text-[10px] px-1 py-0.5 rounded-lg font-semibold ${className}`}>
-            + Rp.{Math.floor(tipAmount).toLocaleString('id-ID')} (tip)
+            + Rp {Math.floor(tipAmount).toLocaleString('id-ID')} (tip)
         </span>
     )
 }

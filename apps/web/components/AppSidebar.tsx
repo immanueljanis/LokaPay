@@ -104,7 +104,7 @@ export function AppSidebar() {
                             }}
                             className="text-destructive hover:text-destructive"
                         >
-                            <span>Keluar</span>
+                            <span>Logout</span>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>

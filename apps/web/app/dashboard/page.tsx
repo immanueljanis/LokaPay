@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { FileText } from 'lucide-react'
+import { useTranslations, useLocale } from 'next-intl'
 import { api } from '../../lib/axios.instance'
 import { useAuth } from '../../src/store/useAuth'
 import ProtectedRoute from '../../components/ProtectedRoute'
@@ -37,6 +38,8 @@ type DashboardData = {
 
 export default function DashboardPage() {
     const { user } = useAuth()
+    const t = useTranslations('dashboard')
+    const locale = useLocale()
 
     const [data, setData] = useState<DashboardData | null>(null)
     const [loading, setLoading] = useState(true)
@@ -53,7 +56,7 @@ export default function DashboardPage() {
                     setData(responseData)
                 }
             } catch (err) {
-                console.error("Gagal ambil data dashboard", err)
+                console.error("Failed to fetch dashboard data", err)
             } finally {
                 if (mounted) {
                     setLoading(false)
@@ -77,12 +80,12 @@ export default function DashboardPage() {
                     <div className="flex h-full items-center justify-center p-6">
                         <div className="text-center">
                             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                            <p className="mt-4 text-muted-foreground">Memuat Dashboard...</p>
+                            <p className="mt-4 text-muted-foreground">{t('loadingDashboard')}</p>
                         </div>
                     </div>
                 ) : !data ? (
                     <div className="flex h-full items-center justify-center p-6">
-                        <p className="text-muted-foreground">Gagal memuat data</p>
+                        <p className="text-muted-foreground">{t('failedToLoad')}</p>
                     </div>
                 ) : (
                     <div className="min-h-full bg-background p-6">
@@ -90,9 +93,9 @@ export default function DashboardPage() {
 
                             {/* CARD SALDO */}
                             <div className="bg-primary rounded-2xl p-8 text-primary-foreground shadow-lg">
-                                <p className="text-primary-foreground/80 text-sm font-medium mb-1">Total Pendapatan (IDR)</p>
+                                <p className="text-primary-foreground/80 text-sm font-medium mb-1">{t('totalRevenue')}</p>
                                 <h2 className="text-4xl font-bold">
-                                    Rp {parseInt(data.balanceIDR).toLocaleString('id-ID')}
+                                    Rp {parseInt(data.balanceIDR).toLocaleString(locale)}
                                 </h2>
                                 <div className="mt-6 flex gap-3">
                                     <CreateInvoiceModal
@@ -102,7 +105,7 @@ export default function DashboardPage() {
                                                 size="lg"
                                                 className="bg-background text-primary px-6 py-2 rounded-lg font-bold hover:bg-secondary hover:text-primary transition-all shadow-md hover:shadow-lg"
                                             >
-                                                + Buat Tagihan Baru
+                                                + {t('createInvoice')}
                                             </Button>
                                         }
                                     />
@@ -111,7 +114,7 @@ export default function DashboardPage() {
                                         size="lg"
                                         className="bg-accent text-accent-foreground px-6 py-2 rounded-lg font-bold hover:bg-accent/90 hover:text-accent-foreground transition-all border border-accent shadow-md hover:shadow-lg"
                                     >
-                                        Tarik Saldo
+                                        {t('withdrawBalance')}
                                     </Button>
                                 </div>
                             </div>
@@ -119,25 +122,25 @@ export default function DashboardPage() {
                             {/* TABEL TRANSAKSI */}
                             <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
                                 <div className="px-6 py-4 border-b border-border">
-                                    <h3 className="font-bold text-card-foreground">Riwayat Transaksi Terakhir</h3>
+                                    <h3 className="font-bold text-card-foreground">{t('transactionHistory')}</h3>
                                 </div>
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-sm text-left">
                                         <thead className="bg-muted text-muted-foreground">
                                             <tr>
-                                                <th className="px-6 py-3">ID</th>
-                                                <th className="px-6 py-3">Waktu</th>
-                                                <th className="px-6 py-3">Tagihan (IDR)</th>
-                                                <th className="px-6 py-3">Terima (IDR)</th>
-                                                <th className="px-6 py-3">Status</th>
-                                                <th className="px-6 py-3 text-center">Aksi</th>
+                                                <th className="px-6 py-3">{t('id')}</th>
+                                                <th className="px-6 py-3">{t('time')}</th>
+                                                <th className="px-6 py-3">{t('invoice')}</th>
+                                                <th className="px-6 py-3">{t('received')}</th>
+                                                <th className="px-6 py-3">{t('status')}</th>
+                                                <th className="px-6 py-3 text-center">{t('action')}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {data.transactions.length === 0 ? (
                                                 <tr>
                                                     <td colSpan={6} className="px-6 py-8 text-center text-muted-foreground">
-                                                        Belum ada transaksi. Ayo mulai jualan!
+                                                        {t('noTransactions')}
                                                     </td>
                                                 </tr>
                                             ) : (
@@ -147,10 +150,10 @@ export default function DashboardPage() {
                                                             {tx.id.slice(0, 8)}...
                                                         </td>
                                                         <td className="px-6 py-4 text-muted-foreground">
-                                                            {new Date(tx.createdAt).toLocaleString('id-ID')}
+                                                            {new Date(tx.createdAt).toLocaleString(locale)}
                                                         </td>
                                                         <td className="px-6 py-4 font-medium text-card-foreground">
-                                                            Rp {Math.floor(parseFloat(tx?.amountInvoice?.toString() || '0')).toLocaleString('id-ID')}
+                                                            Rp {Math.floor(parseFloat(tx?.amountInvoice?.toString() || '0')).toLocaleString(locale)}
                                                         </td>
                                                         <td className="px-6 py-4 font-medium text-card-foreground">
                                                             {(() => {
@@ -165,7 +168,7 @@ export default function DashboardPage() {
                                                                 const merchantReceived = amountInvoice + tipIdr
                                                                 return (
                                                                     <div className="flex items-center gap-1">
-                                                                        <span>Rp {Math.floor(merchantReceived).toLocaleString('id-ID')}</span>
+                                                                        <span>Rp {Math.floor(merchantReceived).toLocaleString(locale)}</span>
                                                                         <TipBadge tipIdr={tipIdr} />
                                                                     </div>
                                                                 )
@@ -187,7 +190,7 @@ export default function DashboardPage() {
                                                                     variant="ghost"
                                                                     size="sm"
                                                                     className="hover:bg-primary/10 hover:text-primary transition-colors"
-                                                                    title="Lihat Invoice"
+                                                                    title={t('viewInvoice')}
                                                                 >
                                                                     <FileText className="h-4 w-4" />
                                                                 </Button>

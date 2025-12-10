@@ -4,10 +4,13 @@ import { useState, useEffect } from 'react'
 import { api } from '../lib/axios.instance'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../src/store/useAuth'
+import { useTranslations } from 'next-intl'
 
 export default function MerchantDashboard() {
   const router = useRouter()
   const { user } = useAuth()
+  const t = useTranslations('home')
+  const tc = useTranslations('common')
   const [amount, setAmount] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -34,7 +37,7 @@ export default function MerchantDashboard() {
 
     } catch (error) {
       console.error(error)
-      alert('Gagal membuat tagihan.')
+      alert('Failed to create invoice.')
     } finally {
       setLoading(false)
     }
@@ -44,7 +47,7 @@ export default function MerchantDashboard() {
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <div className="absolute top-4 left-4">
         <button onClick={() => router.push('/dashboard')} className="text-primary hover:underline">
-          &larr; Kembali ke Dashboard
+          &larr; {t('backToDashboard')}
         </button>
       </div>
 
@@ -67,7 +70,7 @@ export default function MerchantDashboard() {
             disabled={loading}
             className="w-full bg-primary hover:opacity-90 text-primary-foreground font-bold py-4 rounded-lg transition-colors disabled:bg-muted disabled:text-muted-foreground"
           >
-            {loading ? 'Memproses...' : 'Buat QR Code'}
+            {loading ? tc('loading') : t('createQrCode')}
           </button>
         </form>
       </div>

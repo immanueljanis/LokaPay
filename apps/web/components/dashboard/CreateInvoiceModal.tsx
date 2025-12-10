@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { api } from '../../lib/axios.instance'
 import { useAuth } from '../../src/store/useAuth'
+import { useTranslations } from 'next-intl'
 import {
     Dialog,
     DialogContent,
@@ -29,6 +30,8 @@ export function CreateInvoiceModal({
 }: CreateInvoiceModalProps) {
     const router = useRouter()
     const { user } = useAuth()
+    const t = useTranslations('invoice')
+    const tc = useTranslations('common')
     const [amount, setAmount] = useState('')
     const [loading, setLoading] = useState(false)
     const [internalOpen, setInternalOpen] = useState(false)
@@ -55,7 +58,7 @@ export function CreateInvoiceModal({
             router.push(`/invoice/${invoiceId}`)
         } catch (error) {
             console.error(error)
-            alert('Gagal membuat tagihan.')
+            alert(t('createFailed'))
         } finally {
             setLoading(false)
         }
@@ -76,14 +79,14 @@ export function CreateInvoiceModal({
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Buat Tagihan Baru</DialogTitle>
+                    <DialogTitle>Create New Invoice</DialogTitle>
                     <DialogDescription>
-                        Masukkan jumlah tagihan yang ingin dibuat (minimal Rp 10.000)
+                        {t('createDescription')}
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleCreateInvoice} className="space-y-6 mt-4">
                     <div className="space-y-2">
-                        <Label htmlFor="amount">Jumlah Tagihan (IDR)</Label>
+                        <Label htmlFor="amount">{t('amount')}</Label>
                         <div className="relative">
                             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">Rp</span>
                             <Input
@@ -100,7 +103,7 @@ export function CreateInvoiceModal({
                             />
                         </div>
                         <p className="text-xs text-muted-foreground">
-                            Minimal pembayaran: Rp 10.000
+                            {t('minimumPayment')}
                         </p>
                     </div>
                     <div className="flex gap-3 pt-2">
@@ -111,14 +114,14 @@ export function CreateInvoiceModal({
                             disabled={loading}
                             className="flex-1"
                         >
-                            Batal
+                            {tc('cancel')}
                         </Button>
                         <Button
                             type="submit"
                             disabled={loading || !amount || parseFloat(amount) < 10000}
                             className="flex-1"
                         >
-                            {loading ? 'Memproses...' : 'Buat Tagihan'}
+                            {loading ? t('processing') : t('createButton')}
                         </Button>
                     </div>
                 </form>

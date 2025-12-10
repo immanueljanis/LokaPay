@@ -4,10 +4,13 @@ import { useState } from 'react'
 import { api } from '../../lib/axios.instance'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../../src/store/useAuth'
+import { useTranslations } from 'next-intl'
 
 export default function LoginPage() {
     const router = useRouter()
     const login = useAuth((state) => state.login)
+    const t = useTranslations('auth')
+    const tc = useTranslations('common')
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -32,12 +35,12 @@ export default function LoginPage() {
                 login(merchant, token)
                 router.push('/dashboard')
             } else {
-                setError('Response tidak valid dari server')
+                setError(t('invalidResponse'))
             }
 
         } catch (err: any) {
             // Error format: { success: false, message: string, data: null }
-            const msg = err.response?.data?.message || err.message || 'Gagal login. Cek koneksi.'
+            const msg = err.response?.data?.message || err.message || t('loginFailed')
             setError(msg)
         } finally {
             setLoading(false)
@@ -51,7 +54,7 @@ export default function LoginPage() {
                 {/* Header */}
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-primary mb-2">LokaPay</h1>
-                    <p className="text-muted-foreground">Masuk untuk mengelola bisnis Anda</p>
+                    <p className="text-muted-foreground">{t('signInToManage')}</p>
                 </div>
 
                 {/* Error Alert */}
@@ -64,7 +67,7 @@ export default function LoginPage() {
                 {/* Form */}
                 <form onSubmit={handleLogin} className="space-y-5">
                     <div>
-                        <label className="block text-sm font-medium text-card-foreground mb-1">Email Merchant</label>
+                        <label className="block text-sm font-medium text-card-foreground mb-1">{t('email')}</label>
                         <input
                             type="email"
                             required
@@ -76,7 +79,7 @@ export default function LoginPage() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-card-foreground mb-1">Password</label>
+                        <label className="block text-sm font-medium text-card-foreground mb-1">{t('password')}</label>
                         <input
                             type="password"
                             required
@@ -92,13 +95,13 @@ export default function LoginPage() {
                         disabled={loading}
                         className="w-full bg-primary text-primary-foreground font-bold py-3.5 rounded-lg hover:opacity-90 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition shadow-md"
                     >
-                        {loading ? 'Memuat...' : 'Masuk Dashboard'}
+                        {loading ? tc('loading') : t('login')}
                     </button>
                 </form>
 
                 {/* Footer */}
                 <div className="mt-6 text-center text-sm text-muted-foreground">
-                    Belum punya akun? <span className="text-primary cursor-pointer hover:underline">Hubungi Admin</span>
+                    {t('noAccount')} <span className="text-primary cursor-pointer hover:underline">{t('contactAdmin')}</span>
                 </div>
             </div>
         </div>

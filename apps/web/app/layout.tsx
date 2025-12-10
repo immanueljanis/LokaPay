@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { MerchantSyncProvider } from "../components/MerchantSyncProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -23,9 +22,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} antialiased bg-background`}
       >
-        <MerchantSyncProvider>
-          {children}
-        </MerchantSyncProvider>
+        {children}
       </body>
     </html>
   );
