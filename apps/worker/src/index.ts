@@ -11,8 +11,8 @@ async function main() {
 
     setupWorker(relayProcessor);
     console.log("✅ Relayer Worker: READY (Listening to Queue)");
-    console.log("✅ Watcher Cron: SCHEDULED (Every 30s)");
-    cron.schedule('*/30 * * * * *', async () => {
+    console.log("✅ Watcher Cron: SCHEDULED (Every 15s)");
+    cron.schedule('*/15 * * * * *', async () => {
         await runWatcherTask();
     });
 }
