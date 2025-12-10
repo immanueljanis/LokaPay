@@ -130,7 +130,7 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-muted-foreground">Paid (USDT):</span>
-                                    <span className="font-semibold">{amountReceivedUSDT.toFixed(6)} USDT</span>
+                                    <span className="font-semibold">{amountReceivedUSDT.toFixed(3)} USDT</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-muted-foreground">Invoice (IDR):</span>
@@ -169,7 +169,7 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-muted-foreground">Paid (USDT):</span>
-                                    <span className="font-semibold">{amountReceivedUSDT.toFixed(6)} USDT</span>
+                                    <span className="font-semibold">{amountReceivedUSDT.toFixed(3)} USDT</span>
                                 </div>
                             </div>
 
@@ -208,6 +208,14 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
                                     Remaining: Rp {Math.floor(amountInvoice - amountReceivedIdr).toLocaleString('id-ID')} ({(amountUSDT - amountReceivedUSDT).toFixed(6)} USDT)
                                 </div>
                             )}
+
+                            {/* Tip Information Note */}
+                            <div className="w-full mb-3 bg-primary/10 border border-primary/20 p-2.5 rounded-lg text-xs">
+                                <p className="text-card-foreground text-center leading-relaxed">
+                                    💝 <span className="font-semibold">Ingin memberikan tip?</span><br />
+                                    Jika Anda berkenan, Anda dapat mengirim nominal lebih dari tagihan. Seluruh kelebihan pembayaran akan <span className="font-semibold text-primary">100% diterima oleh merchant</span> sebagai bentuk apresiasi Anda.
+                                </p>
+                            </div>
 
                             <div className="bg-card p-2 rounded-lg border border-border">
                                 <QRCode value={tx.paymentAddress || tx.paymentReference || ''} size={150} />
