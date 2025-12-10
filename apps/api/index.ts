@@ -6,11 +6,11 @@ import { prisma } from '@lokapay/database'
 import { getRealExchangeRate, roundUpTo } from './utils/rate'
 import { getFactoryContract, relayerSigner } from './constants/contracts'
 import { ethers } from 'ethers'
-import { createHmac } from 'crypto'
 import { successResponse, errorResponse } from './utils/response'
 import { generateToken } from './utils/jwt'
 import { authMiddleware } from './middleware/auth'
 import { SPREAD_VALUE, TRANSACTION_FEE } from './constants/value'
+import { loginSchema, registerSchema, createTransactionSchema } from './schema'
 
 // Define Hono context variables type
 type Variables = {
@@ -19,44 +19,18 @@ type Variables = {
 
 const app = new Hono<{ Variables: Variables }>()
 
-// 1. Middleware Global
-app.use('*', logger()) // Agar log request muncul di terminal
-app.use('*', cors())   // Agar frontend (Next.js) bisa akses API ini
+app.use('*', logger())
+app.use('*', cors())
 
-// 2. Schema Validasi Input (Zod)
-const loginSchema = z.object({
-    email: z.string().email(),
-    password: z.string(),
-})
-
-const registerSchema = z.object({
-    name: z.string().min(3),
-    email: z.string().email(),
-    password: z.string().min(6),
-    bankName: z.string().optional(),
-    bankAccount: z.string().optional(),
-})
-
-const createTransactionSchema = z.object({
-    merchantId: z.string().uuid(),
-    amountIDR: z.number().min(10000), // Minimal bayar Rp 10.000
-})
-
-// 3. Endpoint Hello World (Cek Server)
 app.get('/', (c) => {
-    return successResponse(c, { status: 'running' }, 'LokaPay API is Running! 🚀')
+    return successResponse(c, { status: 'running', version: '1.0.0', network: process.env.NETWORK, uptime: process.uptime() }, 'LokaPay API is Running! 🚀', 200)
 })
 
-// 4. Endpoint Register Merchant
 app.post('/auth/register', async (c) => {
     try {
-        // Ambil data dari body request
         const body = await c.req.json()
-
-        // Validasi data
         const data = registerSchema.parse(body)
 
-        // Cek apakah email sudah terdaftar
         const existingUser = await prisma.merchant.findUnique({
             where: { email: data.email }
         })
@@ -64,11 +38,8 @@ app.post('/auth/register', async (c) => {
         if (existingUser) {
             return errorResponse(c, 'Email already registered', 400)
         }
-
-        // Hash Password (Native Bun - Aman & Cepat)
         const passwordHash = await Bun.password.hash(data.password)
 
-        // Simpan ke Database
         const newMerchant = await prisma.merchant.create({
             data: {
                 name: data.name,
@@ -79,7 +50,6 @@ app.post('/auth/register', async (c) => {
             }
         })
 
-        // Return sukses (tanpa passwordHash)
         return successResponse(
             c,
             {
@@ -94,17 +64,14 @@ app.post('/auth/register', async (c) => {
         )
 
     } catch (e) {
-        // Handle Error Validasi Zod
         if (e instanceof z.ZodError) {
             return errorResponse(c, e.issues[0]?.message || 'Validation error', 400)
         }
-        // Handle Error Lainnya
         console.error(e)
         return errorResponse(c, 'Internal Server Error', 500)
     }
 })
 
-// Endpoint Login Merchant
 app.post('/auth/login', async (c) => {
     try {
         const body = await c.req.json()
@@ -124,7 +91,6 @@ app.post('/auth/login', async (c) => {
             return errorResponse(c, 'Email atau password salah', 401)
         }
 
-        // Generate JWT token dengan expiry 8 jam
         const token = await generateToken({
             merchantId: merchant.id,
             email: merchant.email
@@ -155,7 +121,6 @@ app.post('/auth/login', async (c) => {
 
 app.get('/merchant/me', authMiddleware, async (c) => {
     try {
-        // Get merchant from context (set by authMiddleware)
         const merchant = c.get('merchant')
         if (!merchant) {
             return errorResponse(c, 'Unauthorized', 401)
@@ -200,7 +165,6 @@ app.get('/merchant/me', authMiddleware, async (c) => {
     }
 })
 
-// Endpoint Create Transaction (Protected - requires auth)
 app.post('/transaction/create', authMiddleware, async (c) => {
     try {
         const body = await c.req.json()
@@ -271,143 +235,6 @@ app.post('/transaction/create', authMiddleware, async (c) => {
     }
 })
 
-// 4. Endpoint Webhook (Dihubungi oleh Tatum)
-app.post('/webhook/tatum', async (c) => {
-    try {
-        const body = await c.req.json()
-        const rawBody = JSON.stringify(body)
-
-        // --- SECURITY: HMAC Verification (Aktifkan di Production) ---
-        const computedHash = createHmac('sha512', process.env.TATUM_API_KEY!)
-            .update(rawBody)
-            .digest('base64')
-        const signature = c.req.header('x-payload-hash')
-
-        // Di Testnet Tatum kadang tidak kirim header ini, jadi log saja dulu
-        if (signature && signature !== computedHash) {
-            console.error("⛔ Fake Webhook Detected! Hash Mismatch")
-            // return c.text('Forbidden', 403) // Uncomment di Production
-        }
-        // -------------------------------------------------------------
-
-        const incomingAddress = body.address
-        const incomingAmount = parseFloat(body.amount)
-        const txHash = body.txId
-
-        const transaction = await prisma.transaction.findFirst({
-            where: {
-                paymentAddress: incomingAddress,
-                status: { in: ['PENDING', 'PARTIALLY_PAID'] }
-            }
-        })
-
-        if (!transaction) {
-            console.log(`⚠️ Transaction not found or already paid: ${incomingAddress}`)
-            return c.text('OK')
-        }
-
-        // --- LOGIC LATE PAYMENT ---
-        const now = new Date()
-        const isExpired = now > transaction.expiresAt
-
-        // Ambil data invoice
-        const invoiceAmount = parseFloat(transaction.amountInvoice.toString())
-        let expectedUSDT = parseFloat(transaction.amountUSDT.toString())
-        let finalRate = parseFloat(transaction.exchangeRate.toString())
-        let isRateUpdated = false
-
-        if (isExpired) {
-            console.log(`⚠️ Late Payment Detected! ID: ${transaction.id}`)
-            const currentRate = await getRealExchangeRate()
-
-            if (currentRate) {
-                // Hitung ulang kebutuhan USDT dengan rate baru + spread 1.5%
-                const newCalculatedUSDT = (invoiceAmount / currentRate) * 1.015
-
-                // Hanya update jika rate turun (butuh lebih banyak USDT)
-                // Jika rate naik (USDT menguat), merchant untung spread lebih, biarkan tagihan lama.
-                if (newCalculatedUSDT > expectedUSDT) {
-                    console.log(`📉 Rate Drop! Adjusting Bill: ${expectedUSDT} -> ${newCalculatedUSDT}`)
-                    expectedUSDT = newCalculatedUSDT
-                    finalRate = currentRate
-                    isRateUpdated = true
-                }
-            }
-        }
-
-        // --- LOGIC AKUMULASI ---
-        const currentReceivedUSDT = parseFloat(transaction.amountReceivedUSDT.toString())
-        const totalReceivedUSDT = currentReceivedUSDT + incomingAmount
-
-        let newStatus = transaction.status
-
-        if (totalReceivedUSDT < (expectedUSDT - 0.0001)) {
-            newStatus = 'PARTIALLY_PAID'
-        } else if (totalReceivedUSDT > (expectedUSDT + 0.1)) {
-            newStatus = 'OVERPAID'
-        } else {
-            newStatus = 'PAID'
-        }
-
-        // Hitung semua nilai yang diperlukan
-        const amountReceivedIdr = Math.floor(totalReceivedUSDT * finalRate)
-
-        // Hitung feeApp (1.5% dari invoice) - tetap sama meskipun rate berubah
-        const feeApp = invoiceAmount * 0.015
-
-        // Hitung tip jika overpaid
-        let tipIdr = 0
-        if (newStatus === 'OVERPAID') {
-            const excessUSDT = totalReceivedUSDT - expectedUSDT
-            tipIdr = Math.floor(excessUSDT * finalRate)
-        }
-
-        // --- UPDATE DATABASE ATOMIC ---
-        await prisma.$transaction(async (tx) => {
-            // Update Transaction dengan semua field yang sudah dihitung
-            await tx.transaction.update({
-                where: { id: transaction.id },
-                data: {
-                    status: newStatus,
-                    // Field Payment Received
-                    amountReceivedUSDT: totalReceivedUSDT,
-                    amountReceivedIdr: amountReceivedIdr,
-                    // Field Breakdown
-                    tipIdr: tipIdr,
-                    feeApp: feeApp, // Fee tetap 1.5% dari invoice
-                    // Jika ada penyesuaian rate karena telat, update juga
-                    amountUSDT: isRateUpdated ? expectedUSDT : undefined,
-                    exchangeRate: isRateUpdated ? finalRate : undefined,
-                    // Blockchain
-                    txHash: (newStatus === 'PAID' || newStatus === 'OVERPAID') ? txHash : undefined,
-                    confirmedAt: (newStatus === 'PAID' || newStatus === 'OVERPAID') ? new Date() : undefined,
-                }
-            })
-
-            // Update Merchant Balance (Hanya jika Status Baru = Lunas, dan sebelumnya belum Lunas)
-            const isFinal = newStatus === 'PAID' || newStatus === 'OVERPAID'
-            const wasNotFinal = transaction.status !== 'PAID' && transaction.status !== 'OVERPAID'
-
-            if (isFinal && wasNotFinal) {
-                // Merchant menerima invoiceAmount (tagihan asli) + tip jika ada
-                const invoiceValue = parseFloat(transaction.amountInvoice.toString())
-                let creditIDR = invoiceValue + tipIdr
-
-                await tx.merchant.update({
-                    where: { id: transaction.merchantId },
-                    data: { balanceIDR: { increment: creditIDR } }
-                })
-                console.log(`💰 Merchant Credited: Rp ${creditIDR} (Invoice: ${invoiceValue} + Tip: ${tipIdr})`)
-            }
-        })
-
-        return c.text('OK')
-    } catch (e) {
-        console.error('Webhook Error:', e)
-        return c.text('Error handled', 200)
-    }
-})
-
 app.get('/transaction/:id', authMiddleware, async (c) => {
     const id = c.req.param('id')
     const merchant = c.get('merchant')
@@ -465,7 +292,6 @@ app.get('/merchant/:id/dashboard', authMiddleware, async (c) => {
     }
 })
 
-// Export untuk Bun
 console.log('🚀 API Server starting on port 3001...')
 export default {
     port: 3001,

@@ -2,6 +2,7 @@ import { ethers } from 'ethers';
 import { prisma } from '@lokapay/database';
 import { provider, USDT_ADDRESS } from '../constants/contracts';
 import { sweepQueue } from '../queue';
+import { BUFFER_AMOUNT_PAID_OVERPAID } from '../constants/value';
 
 const ERC20_ABI = ["function balanceOf(address owner) view returns (uint256)"];
 const usdtContract = new ethers.Contract(USDT_ADDRESS, ERC20_ABI, provider);
@@ -78,7 +79,7 @@ export async function runWatcherTask() {
         // Tentukan status baru (hanya untuk transaksi yang belum final)
         let newStatus = tx.status;
         if (!isAlreadyFinal) {
-          if (balance >= targetAmount + 0.1) {
+          if (balance >= targetAmount + BUFFER_AMOUNT_PAID_OVERPAID) {
             newStatus = 'OVERPAID';
           } else if (isFullPayment) {
             newStatus = 'PAID';
