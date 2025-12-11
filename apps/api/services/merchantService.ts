@@ -8,5 +8,9 @@ export const merchantService = {
     getDashboard: async (id: string) => {
         return merchantRepository.findByIdWithTransactions(id)
     },
+
+    listAll: async () => {
+        return merchantRepository.findAllLite()
+    },
 }
 

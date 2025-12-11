@@ -137,6 +137,37 @@
     "payouts": "提现",
     "settings": "设置"
   },
+  "merchants": {
+    "title": "商户列表",
+    "subtitle": "所有商户",
+    "loading": "加载中...",
+    "empty": "没有商户。",
+    "name": "名称",
+    "balance": "余额",
+    "bank": "银行",
+    "created": "创建时间"
+  },
+  "payouts": {
+    "title": "提现列表",
+    "subtitle": "提现请求概览",
+    "loading": "正在加载提现...",
+    "empty": "暂无提现记录。",
+    "merchant": "商户",
+    "amount": "申请金额",
+    "final": "到账金额（扣费后）",
+    "status": "状态",
+    "bank": "银行",
+    "created": "创建时间",
+    "reference": "参考/备注",
+    "action": "操作",
+    "complete": "完成",
+    "reject": "拒绝",
+    "confirmComplete": "标记为已完成？",
+    "confirmReject": "拒绝原因？",
+    "completedSuccess": "提现已标记为完成",
+    "rejectedSuccess": "提现已拒绝",
+    "requestFailed": "请求失败"
+  },
   "home": {
     "backToDashboard": "返回仪表板",
     "createQrCode": "创建二维码"

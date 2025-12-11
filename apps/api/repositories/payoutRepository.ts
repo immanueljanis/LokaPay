@@ -46,6 +46,22 @@ export const payoutRepository = {
         })
     },
 
+    findAllWithMerchant: async () => {
+        return prisma.payout.findMany({
+            orderBy: { createdAt: 'desc' },
+            take: 100,
+            include: {
+                merchant: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                    },
+                },
+            },
+        })
+    },
+
     updatePayoutStatus: async (
         payoutId: string,
         status: 'COMPLETED' | 'REJECTED',
@@ -62,3 +78,4 @@ export const payoutRepository = {
         })
     },
 }
+

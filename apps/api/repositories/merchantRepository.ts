@@ -38,5 +38,25 @@ export const merchantRepository = {
             },
         })
     },
+
+    findAllLite: () => {
+        return prisma.merchant.findMany({
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                balanceIDR: true,
+                bankName: true,
+                bankAccount: true,
+                createdAt: true,
+                updatedAt: true,
+            },
+            where: {
+                role: 'MERCHANT',
+            },
+            orderBy: { createdAt: 'desc' },
+            take: 100,
+        })
+    },
 }
 

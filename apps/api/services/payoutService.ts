@@ -72,4 +72,8 @@ export const payoutService = {
     listPayouts: async (merchantId: string) => {
         return payoutRepository.findPayoutsByMerchant(merchantId)
     },
+
+    listAll: async () => {
+        return payoutRepository.findAllWithMerchant()
+    },
 }

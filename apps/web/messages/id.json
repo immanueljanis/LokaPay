@@ -137,6 +137,37 @@
     "payouts": "Pencairan",
     "settings": "Pengaturan"
   },
+  "merchants": {
+    "title": "Daftar Merchant",
+    "subtitle": "Semua merchant terdaftar",
+    "loading": "Memuat...",
+    "empty": "Belum ada merchant.",
+    "name": "Nama",
+    "balance": "Saldo",
+    "bank": "Bank",
+    "created": "Dibuat"
+  },
+  "payouts": {
+    "title": "Daftar Pencairan",
+    "subtitle": "Ringkasan permintaan pencairan",
+    "loading": "Memuat pencairan...",
+    "empty": "Belum ada pencairan.",
+    "merchant": "Merchant",
+    "amount": "Diminta",
+    "final": "Diterima (setelah fee)",
+    "status": "Status",
+    "bank": "Bank",
+    "created": "Dibuat",
+    "reference": "Referensi / Catatan",
+    "action": "Aksi",
+    "complete": "Selesaikan",
+    "reject": "Tolak",
+    "confirmComplete": "Tandai sebagai selesai?",
+    "confirmReject": "Alasan penolakan?",
+    "completedSuccess": "Pencairan berhasil ditandai selesai",
+    "rejectedSuccess": "Pencairan berhasil ditolak",
+    "requestFailed": "Permintaan gagal"
+  },
   "home": {
     "backToDashboard": "Kembali ke Dashboard",
     "createQrCode": "Buat QR Code"

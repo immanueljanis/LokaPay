@@ -59,3 +59,27 @@ export const dashboardController = async (c: any) => {
     }
 }
 
+export const listMerchantsController = async (c: any) => {
+    try {
+        const merchants = await merchantService.listAll()
+        return successResponse(
+            c,
+            merchants.map((m: any) => ({
+                id: m.id,
+                name: m.name,
+                email: m.email,
+                role: m.role,
+                balanceIDR: m.balanceIDR.toString(),
+                bankName: m.bankName,
+                bankAccount: m.bankAccount,
+                createdAt: m.createdAt,
+                updatedAt: m.updatedAt,
+            })),
+            'Merchants retrieved successfully'
+        )
+    } catch (e) {
+        console.error(e)
+        return errorResponse(c, 'Server error', 500)
+    }
+}
+

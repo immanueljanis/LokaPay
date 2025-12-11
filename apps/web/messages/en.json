@@ -137,6 +137,37 @@
     "payouts": "Payouts",
     "settings": "Settings"
   },
+  "merchants": {
+    "title": "Merchants",
+    "subtitle": "All merchants list",
+    "loading": "Loading...",
+    "empty": "No merchants found.",
+    "name": "Name",
+    "balance": "Balance",
+    "bank": "Bank",
+    "created": "Created"
+  },
+  "payouts": {
+    "title": "Payouts",
+    "subtitle": "Payout requests overview",
+    "loading": "Loading payouts...",
+    "empty": "No payouts found.",
+    "merchant": "Merchant",
+    "amount": "Requested",
+    "final": "Final (after fee)",
+    "status": "Status",
+    "bank": "Bank",
+    "created": "Created",
+    "reference": "Reference / Note",
+    "action": "Action",
+    "complete": "Complete",
+    "reject": "Reject",
+    "confirmComplete": "Mark as completed?",
+    "confirmReject": "Reason to reject?",
+    "completedSuccess": "Payout marked as completed",
+    "rejectedSuccess": "Payout rejected",
+    "requestFailed": "Request failed"
+  },
   "home": {
     "backToDashboard": "Back to Dashboard",
     "createQrCode": "Create QR Code"

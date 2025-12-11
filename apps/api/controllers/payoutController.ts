@@ -80,4 +80,33 @@ export const payoutController = {
             return errorResponse(c, e.message || 'Failed to fetch payouts', 400)
         }
     },
+
+    listAllAdmin: async (c: Context) => {
+        try {
+            const payouts = await payoutService.listAll()
+            return successResponse(
+                c,
+                payouts.map((p: any) => ({
+                    id: p.id,
+                    merchantId: p.merchantId,
+                    merchantName: p.merchant?.name,
+                    merchantEmail: p.merchant?.email,
+                    amountRequested: p.amountRequested,
+                    feeAdmin: p.feeAdmin,
+                    amountFinal: p.amountFinal,
+                    status: p.status,
+                    toBankName: p.toBankName,
+                    toBankAccount: p.toBankAccount,
+                    toBankHolder: p.toBankHolder,
+                    referenceNo: p.referenceNo,
+                    rejectionReason: p.rejectionReason,
+                    createdAt: p.createdAt,
+                    updatedAt: p.updatedAt,
+                })),
+                'Payout list retrieved'
+            )
+        } catch (e: any) {
+            return errorResponse(c, e.message || 'Failed to fetch payouts', 400)
+        }
+    },
 }
