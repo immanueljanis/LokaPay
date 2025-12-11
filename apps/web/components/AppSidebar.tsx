@@ -2,6 +2,7 @@
 
 import { LayoutDashboard, FileText, User, Users, ReceiptText, WalletMinimal, Settings } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import {
     Sidebar,
@@ -42,14 +43,18 @@ export function AppSidebar() {
     return (
         <Sidebar>
             <SidebarHeader className="border-b border-sidebar-border px-4 py-6">
-                <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-petrol text-petrol-foreground">
-                        <span className="text-lg font-bold">LP</span>
-                    </div>
-                    <div>
-                        <h2 className="text-lg font-bold text-sidebar-foreground">LokaPay</h2>
-                        <p className="text-xs text-muted-foreground">Payment Without Borders</p>
-                    </div>
+                <div className="flex flex-col items-center gap-4 pt-4">
+                    <Image
+                        src="/logo/logoWithTextTransparent.png"
+                        alt="LokaPay"
+                        width={1000}
+                        height={1000}
+                        className="w-32 object-contain"
+                        priority
+                    />
+                    <p className="text-xs text-muted-foreground italic tracking-wide">
+                        Payment Without Borders
+                    </p>
                 </div>
             </SidebarHeader>
 
