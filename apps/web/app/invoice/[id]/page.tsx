@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, use } from 'react' // Import 'use' untuk params di Next 15/14
+import { useEffect, useState, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { api } from '../../../lib/axios.instance'
 import QRCode from 'react-qr-code'
@@ -19,9 +19,11 @@ type Transaction = {
     amountInvoice: string | number
     amountUSDT: string | number
     exchangeRate: string | number
+
     // Field Payment Received
     amountReceivedUSDT: string | number
     amountReceivedIdr: string | number
+
     // Field Breakdown
     tipIdr: string | number
     feeApp: string | number
@@ -43,7 +45,8 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
     const [tx, setTx] = useState<Transaction | null>(null)
     const [loading, setLoading] = useState(true)
     const [copied, setCopied] = useState(false)
-    console.log(tx)
+    const [tipAmount, setTipAmount] = useState<number>(0)
+
     const fetchStatus = async () => {
         try {
             const transaction = await api.get<Transaction>(`/transaction/${id}`)
@@ -57,11 +60,10 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
 
     useEffect(() => {
         fetchStatus()
-        // Polling hanya jika status masih PENDING atau PARTIALLY_PAID
         const interval = setInterval(() => {
             fetchStatus()
-        }, 5000) // Check setiap 5 detik
-        return () => clearInterval(interval) // Cleanup
+        }, 5000)
+        return () => clearInterval(interval)
     }, [id])
 
     if (loading && !tx) return <div className="p-10 text-center">{t('loading')}</div>
@@ -80,9 +82,9 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
     const amountReceivedIdr = parseFloat((tx.amountReceivedIdr || '0').toString())
     const amountReceivedUSDT = parseFloat((tx.amountReceivedUSDT || '0').toString())
     const tipIdr = parseFloat((tx.tipIdr || '0').toString())
-    const tipAmount = tipIdr > 0 ? tipIdr.toFixed(0) : '0'
 
-    // Format tanggal expiry
+    const totalAmount = Math.max(amountUSDT + tipAmount, 0)
+
     const expiresAt = tx.expiresAt ? new Date(tx.expiresAt) : null
     const expiresAtFormatted = expiresAt ? expiresAt.toLocaleString(locale, {
         day: '2-digit',
@@ -93,8 +95,14 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
     }) : null
 
     const eip681URI = tx.paymentAddress
-        ? generateEIP681AddressURI(tx.paymentAddress)
+        ? generateEIP681AddressURI(tx.paymentAddress, totalAmount)
         : tx.paymentReference || ''
+
+    const tipOptions = [
+        { label: 'No Tip', value: 0 },
+        { label: '5%', value: parseFloat((amountUSDT * 0.05).toFixed(3)) },
+        { label: '10%', value: parseFloat((amountUSDT * 0.1).toFixed(3)) },
+    ]
 
     return (
         <div className="min-h-screen bg-primary text-primary-foreground flex flex-col items-center justify-center p-3">
@@ -111,7 +119,45 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
                     )}
                 </div>
 
-                <div className="p-4 flex flex-col items-center flex-1 overflow-y-auto">
+                <div className="p-4 flex flex-col items-center flex-1 overflow-y-auto space-y-4">
+
+                    {(!isPaid && !isOverpaid) && (
+                        <div className="w-full bg-muted/40 border border-border rounded-lg p-3 space-y-2">
+                            <div className="grid grid-cols-1 gap-2">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-sm font-semibold text-card-foreground">Tip:</span>
+                                    {tipOptions.map((opt) => (
+                                        <button
+                                            key={opt.label}
+                                            onClick={() => setTipAmount(opt.value)}
+                                            className={`px-3 py-1 rounded-md text-xs border transition ${Math.abs(tipAmount - opt.value) < 0.0001
+                                                ? 'bg-primary text-primary-foreground border-primary'
+                                                : 'bg-background text-card-foreground border-border hover:border-primary/50'
+                                                }`}
+                                        >
+                                            {opt.label === 'No Tip'
+                                                ? opt.label
+                                                : `${opt.label} (${opt.value.toFixed(3)} USDT)`}
+                                        </button>
+                                    ))}
+                                    <div className="flex items-center gap-1">
+                                        <span className="text-xs text-muted-foreground">Custom</span>
+                                        <input
+                                            type="number"
+                                            min={0}
+                                            step="0.001"
+                                            value={tipAmount.toString()}
+                                            onChange={(e) => setTipAmount(parseFloat(e.target.value) || 0)}
+                                            className="w-24 p-1.5 border border-input rounded bg-background text-foreground text-xs"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                    Total: <span className="font-semibold text-card-foreground">{totalAmount.toFixed(3)} USDT</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* OVERPAID */}
                     {isOverpaid ? (
@@ -199,7 +245,10 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
                                 <div className="flex justify-between items-center">
                                     <span className="text-muted-foreground">{t('amountToPay')}</span>
                                     <div className="text-right">
-                                        <div className="font-bold text-sm">{amountUSDT.toFixed(3)} USDT</div>
+                                        <div className="font-bold text-sm">{totalAmount.toFixed(3)} USDT</div>
+                                        <div className="text-xs text-muted-foreground">
+                                            Base {amountUSDT.toFixed(3)} + Tip {tipAmount.toFixed(3)}
+                                        </div>
                                         <div className="text-xs text-muted-foreground">≈ Rp {Math.floor(amountInvoice).toLocaleString(locale)}</div>
                                     </div>
                                 </div>
@@ -219,14 +268,6 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
                                     {t('remaining')} Rp {Math.floor(amountInvoice - amountReceivedIdr).toLocaleString(locale)} ({(amountUSDT - amountReceivedUSDT).toFixed(3)} USDT)
                                 </div>
                             )}
-
-                            {/* Tip Information Note */}
-                            <div className="w-full mb-3 bg-primary/10 border border-primary/20 p-2.5 rounded-lg text-xs">
-                                <p className="text-card-foreground text-center leading-relaxed">
-                                    💝 <span className="font-semibold">{t('tipNote')}</span><br />
-                                    {t('tipDescription')}
-                                </p>
-                            </div>
 
                             <div className="bg-card p-2 rounded-lg border border-border">
                                 <QRCode value={eip681URI} size={150} />
