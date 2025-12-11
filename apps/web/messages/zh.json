@@ -126,6 +126,17 @@
     "payoutCompleted": "已完成",
     "payoutRejected": "已拒绝"
   },
+  "sidebar": {
+    "menu": "菜单",
+    "admin": "管理员",
+    "dashboard": "仪表板",
+    "invoice": "发票",
+    "account": "账户",
+    "merchants": "商户",
+    "transactions": "交易",
+    "payouts": "提现",
+    "settings": "设置"
+  },
   "home": {
     "backToDashboard": "返回仪表板",
     "createQrCode": "创建二维码"

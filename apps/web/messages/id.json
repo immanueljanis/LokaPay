@@ -126,6 +126,17 @@
     "payoutCompleted": "Selesai",
     "payoutRejected": "Ditolak"
   },
+  "sidebar": {
+    "menu": "Menu",
+    "admin": "Admin",
+    "dashboard": "Dashboard",
+    "invoice": "Invoice",
+    "account": "Akun",
+    "merchants": "Merchant",
+    "transactions": "Transaksi",
+    "payouts": "Pencairan",
+    "settings": "Pengaturan"
+  },
   "home": {
     "backToDashboard": "Kembali ke Dashboard",
     "createQrCode": "Buat QR Code"

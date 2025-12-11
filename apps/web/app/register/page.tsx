@@ -6,7 +6,7 @@ import { api } from '../../lib/axios.instance'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../../src/store/useAuth'
 import { useTranslations } from 'next-intl'
-import BANK_OPTIONS from '../../src/constants/value'
+import { BANK_OPTIONS } from '../../src/constants/value'
 import { FormInput, FormSelect } from '../../components/input/FormField'
 import { showToast } from '../../lib/toast'
 import { registerSchema, type RegisterFormData } from '../../lib/validation'
@@ -28,8 +28,6 @@ export default function RegisterPage() {
     })
     const [errors, setErrors] = useState<Partial<Record<keyof RegisterFormData, string>>>({})
     const [loading, setLoading] = useState(false)
-
-    const bankOptions = BANK_OPTIONS()
 
     const handleChange = (field: keyof RegisterFormData) => (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -161,7 +159,7 @@ export default function RegisterPage() {
                             label={t('bankName')}
                             required
                             placeholder={t('selectBank')}
-                            options={bankOptions.map(bank => ({ value: bank.value, label: bank.name }))}
+                            options={BANK_OPTIONS.map(bank => ({ value: bank.value, label: bank.name }))}
                             value={formData.bankName}
                             onChange={handleChange('bankName')}
                             error={errors.bankName}

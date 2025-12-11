@@ -1,8 +1,7 @@
 import { z } from 'zod'
-import BANK_OPTIONS from '../src/constants/value'
+import { BANK_OPTIONS } from '../src/constants/value'
 
-const bankOptions = BANK_OPTIONS()
-const validBankNames = bankOptions.map(bank => bank.value)
+const validBankNames = BANK_OPTIONS.map(bank => bank.value)
 
 export const registerSchema = z.object({
     name: z.string().min(3, 'Name must be at least 3 characters'),

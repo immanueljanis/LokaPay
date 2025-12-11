@@ -12,6 +12,7 @@ interface User {
     bankAccount?: string | null
     createdAt?: string
     updatedAt?: string
+    role?: string
 }
 
 interface AuthState {

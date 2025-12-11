@@ -126,6 +126,17 @@
     "payoutCompleted": "Completed",
     "payoutRejected": "Rejected"
   },
+  "sidebar": {
+    "menu": "Menu",
+    "admin": "Admin",
+    "dashboard": "Dashboard",
+    "invoice": "Invoice",
+    "account": "Account",
+    "merchants": "Merchants",
+    "transactions": "Transactions",
+    "payouts": "Payouts",
+    "settings": "Settings"
+  },
   "home": {
     "backToDashboard": "Back to Dashboard",
     "createQrCode": "Create QR Code"

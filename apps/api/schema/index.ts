@@ -1,21 +1,18 @@
 import { z } from 'zod'
-import BANK_OPTIONS from '../constants/value'
+import { BANK_OPTIONS } from '../constants/value'
 
 export const loginSchema = z.object({
     email: z.string().email(),
     password: z.string(),
 })
 
-const bankOptions = BANK_OPTIONS()
-const validBankNames = bankOptions.map(bank => bank.value)
+const validBankNames = BANK_OPTIONS.map((bank) => bank.value as string)
 
 export const registerSchema = z.object({
     name: z.string().min(3, 'Name must be at least 3 characters'),
     email: z.string().email('Invalid email address'),
     password: z.string().min(6, 'Password must be at least 6 characters'),
-    bankName: z.enum(validBankNames as [string, ...string[]], {
-        errorMap: () => ({ message: 'Please select a valid bank' })
-    }),
+    bankName: z.enum(validBankNames as [string, ...string[]], { message: 'Please select a valid bank' }),
     bankAccount: z.string().min(1, 'Bank account number is required'),
 })
 

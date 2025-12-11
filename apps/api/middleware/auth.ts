@@ -3,7 +3,7 @@ import { verifyToken } from '../utils/jwt'
 import { errorResponse } from '../utils/response'
 
 type Variables = {
-    merchant: { merchantId: string; email: string }
+    merchant: { merchantId: string; email: string; role?: string }
 }
 
 export async function authMiddleware(c: Context<{ Variables: Variables }>, next: () => Promise<void>) {

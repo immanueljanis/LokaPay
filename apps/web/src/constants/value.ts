@@ -1,20 +1,60 @@
-export default function BANK_OPTIONS() {
-    return [
+export const BANK_OPTIONS = [
+    {
+        name: "BCA",
+        value: "BCA",
+    },
+    {
+        name: "BRI",
+        value: "BRI",
+    },
+    {
+        name: "Mandiri",
+        value: "Mandiri",
+    },
+    {
+        name: "BNI",
+        value: "BNI",
+    }
+]
+
+export const MENU_DASHBOARD = {
+    merchant: [
         {
-            name: "BCA",
-            value: "BCA",
+            label: 'Dashboard',
+            i18nKey: 'dashboard',
+            url: '/dashboard',
         },
         {
-            name: "BRI",
-            value: "BRI",
+            label: 'Invoice',
+            i18nKey: 'invoice',
+            url: '/invoice',
         },
         {
-            name: "Mandiri",
-            value: "Mandiri",
+            label: 'Account',
+            i18nKey: 'account',
+            url: '/account',
+        },
+    ],
+    admin: [
+        {
+            label: 'Merchants',
+            i18nKey: 'merchants',
+            url: '/merchants',
         },
         {
-            name: "BNI",
-            value: "BNI",
-        }
+            label: 'Transactions',
+            i18nKey: 'transactions',
+            url: '/transactions',
+        },
+        {
+            label: 'Payouts',
+            i18nKey: 'payouts',
+            url: '/payouts',
+        },
+        {
+            label: 'Settings',
+            i18nKey: 'settings',
+            url: '/settings',
+        },
     ]
 }

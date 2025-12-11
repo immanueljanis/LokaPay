@@ -1,6 +1,6 @@
 'use client'
 
-import { LayoutDashboard, FileText, User } from 'lucide-react'
+import { LayoutDashboard, FileText, User, Users, ReceiptText, WalletMinimal, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
@@ -16,29 +16,28 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { useAuth } from '../src/store/useAuth'
-
-const menuItems = [
-    {
-        title: 'Dashboard',
-        url: '/dashboard',
-        icon: LayoutDashboard,
-    },
-    {
-        title: 'Invoice',
-        url: '/invoice',
-        icon: FileText,
-    },
-    {
-        title: 'Account',
-        url: '/account',
-        icon: User,
-    },
-]
+import { MENU_DASHBOARD } from '../src/constants/value'
+import { useTranslations } from 'next-intl'
 
 export function AppSidebar() {
     const pathname = usePathname()
     const router = useRouter()
     const { user, logout } = useAuth()
+    const t = useTranslations('sidebar')
+
+    const iconMap: Record<string, any> = {
+        dashboard: LayoutDashboard,
+        invoice: FileText,
+        account: User,
+        merchants: Users,
+        transactions: ReceiptText,
+        payouts: WalletMinimal,
+        settings: Settings,
+    }
+
+    const isAdmin = user?.role === 'ADMIN'
+    const menuMerchant = MENU_DASHBOARD.merchant
+    const menuAdmin = MENU_DASHBOARD.admin
 
     return (
         <Sidebar>
@@ -55,26 +54,51 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <SidebarGroup>
-                    <SidebarGroupLabel>Menu</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            {menuItems.map((item) => {
-                                const isActive = pathname === item.url || pathname?.startsWith(item.url + '/')
-                                return (
-                                    <SidebarMenuItem key={item.title}>
-                                        <SidebarMenuButton asChild isActive={isActive}>
-                                            <Link href={item.url}>
-                                                <item.icon />
-                                                <span>{item.title}</span>
-                                            </Link>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                )
-                            })}
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
+                {isAdmin ? (
+                    <SidebarGroup>
+                        <SidebarGroupLabel>{t('admin')}</SidebarGroupLabel>
+                        <SidebarGroupContent>
+                            <SidebarMenu>
+                                {menuAdmin?.map((item) => {
+                                    const isActive = pathname === item.url || pathname?.startsWith(item.url + '/')
+                                    const Icon = iconMap[item.i18nKey] || LayoutDashboard
+                                    return (
+                                        <SidebarMenuItem key={item.url}>
+                                            <SidebarMenuButton asChild isActive={isActive}>
+                                                <Link href={item.url}>
+                                                    <Icon />
+                                                    <span>{t(item.i18nKey)}</span>
+                                                </Link>
+                                            </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                    )
+                                })}
+                            </SidebarMenu>
+                        </SidebarGroupContent>
+                    </SidebarGroup>
+                ) : (
+                    <SidebarGroup>
+                        <SidebarGroupLabel>{t('menu')}</SidebarGroupLabel>
+                        <SidebarGroupContent>
+                            <SidebarMenu>
+                                {menuMerchant.map((item) => {
+                                    const isActive = pathname === item.url || pathname?.startsWith(item.url + '/')
+                                    const Icon = iconMap[item.i18nKey] || LayoutDashboard
+                                    return (
+                                        <SidebarMenuItem key={item.url}>
+                                            <SidebarMenuButton asChild isActive={isActive}>
+                                                <Link href={item.url}>
+                                                    <Icon />
+                                                    <span>{t(item.i18nKey)}</span>
+                                                </Link>
+                                            </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                    )
+                                })}
+                            </SidebarMenu>
+                        </SidebarGroupContent>
+                    </SidebarGroup>
+                )}
             </SidebarContent>
 
             <SidebarFooter className="border-t border-sidebar-border px-4 py-4">

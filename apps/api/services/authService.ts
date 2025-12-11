@@ -1,6 +1,8 @@
 import { generateToken } from '../utils/jwt'
 import { merchantRepository } from '../repositories/merchantRepository'
 
+const DEFAULT_ROLE = 'MERCHANT'
+
 export const authService = {
     register: async (data: { name: string; email: string; password: string; bankName?: string; bankAccount?: string }) => {
         const existingUser = await merchantRepository.findByEmail(data.email)
@@ -23,6 +25,7 @@ export const authService = {
                 id: newMerchant.id,
                 name: newMerchant.name,
                 email: newMerchant.email,
+                role: (newMerchant as any).role || DEFAULT_ROLE,
             },
         }
     },
@@ -41,6 +44,7 @@ export const authService = {
         const token = await generateToken({
             merchantId: merchant.id,
             email: merchant.email,
+            role: (merchant as any).role || DEFAULT_ROLE,
         })
 
         return {
@@ -49,6 +53,7 @@ export const authService = {
                 name: merchant.name,
                 email: merchant.email,
                 balanceIDR: merchant.balanceIDR,
+                role: (merchant as any).role || DEFAULT_ROLE,
             },
             token,
         }

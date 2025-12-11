@@ -24,6 +24,7 @@ export const meController = async (c: any) => {
                 bankAccount: merchantData.bankAccount,
                 createdAt: merchantData.createdAt,
                 updatedAt: merchantData.updatedAt,
+                role: (merchantData as any).role || 'MERCHANT',
             },
             'Merchant data retrieved successfully'
         )

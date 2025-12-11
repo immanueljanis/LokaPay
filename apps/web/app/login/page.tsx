@@ -47,13 +47,16 @@ export default function LoginPage() {
             if (merchant && token) {
                 login(merchant, token)
                 showToast.success(t('loginSuccess') || 'Login successful!')
-                router.push('/dashboard')
+                if (merchant.role === 'ADMIN') {
+                    router.push('/merchants')
+                } else {
+                    router.push('/dashboard')
+                }
             } else {
                 setError(t('invalidResponse'))
             }
 
         } catch (err: any) {
-            // Error format: { success: false, message: string, data: null }
             const msg = err.response?.data?.message || err.message || t('loginFailed')
             setError(msg)
         } finally {

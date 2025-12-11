@@ -4,7 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun --watch index.ts"
+    "dev": "bun --watch index.ts",
+    "db:seed": "bun run ./seed/adminSeed.ts"
   },
   "devDependencies": {
     "@types/bun": "latest"

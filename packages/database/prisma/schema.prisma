@@ -12,6 +12,7 @@ model Merchant {
   email         String   @unique
   passwordHash  String   // Disimpan terenkripsi (bcrypt/argon2)
   name          String   // Nama Toko (Contoh: "Nasi Goreng Pak Bagus")
+  role          String   @default("MERCHANT")
   walletAddress String?  // Alamat wallet pribadi merchant (opsional untuk MVP)
   bankName      String?  // Contoh: BCA
   bankAccount   String?  // Contoh: 1234567890
