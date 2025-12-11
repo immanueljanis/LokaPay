@@ -91,22 +91,22 @@ export default function DashboardPage() {
                         <p className="text-muted-foreground">{t('failedToLoad')}</p>
                     </div>
                 ) : (
-                    <div className="min-h-full bg-background p-6">
-                        <div className="max-w-4xl mx-auto space-y-6">
+                    <div className="min-h-full bg-background px-3 sm:px-6 py-6 max-w-full overflow-x-hidden">
+                        <div className="max-w-5xl mx-auto space-y-6 w-full">
 
                             {/* CARD SALDO */}
-                            <div className="bg-primary rounded-2xl p-8 text-primary-foreground shadow-lg">
+                            <div className="bg-primary rounded-2xl p-6 sm:p-8 text-primary-foreground shadow-lg">
                                 <p className="text-primary-foreground/80 text-sm font-medium mb-1">{t('totalRevenue')}</p>
-                                <h2 className="text-4xl font-bold">
+                                <h2 className="text-3xl sm:text-4xl font-bold">
                                     Rp {parseInt(data.balanceIDR).toLocaleString(locale)}
                                 </h2>
-                                <div className="mt-6 flex gap-3">
+                                <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:items-center sm:flex-wrap">
                                     <CreateInvoiceModal
                                         trigger={
                                             <Button
                                                 variant="outline"
                                                 size="lg"
-                                                className="bg-background text-primary px-6 py-2 rounded-lg font-bold hover:bg-secondary hover:text-primary transition-all shadow-md hover:shadow-lg"
+                                                className="bg-background text-primary px-6 py-2 rounded-lg font-bold hover:bg-secondary hover:text-primary transition-all shadow-md hover:shadow-lg w-full sm:w-auto"
                                             >
                                                 + {t('createInvoice')}
                                             </Button>
@@ -117,7 +117,7 @@ export default function DashboardPage() {
                                             <Button
                                                 variant="outline"
                                                 size="lg"
-                                                className="bg-accent text-accent-foreground px-6 py-2 rounded-lg font-bold hover:bg-accent/90 hover:text-accent-foreground transition-all border border-accent shadow-md hover:shadow-lg"
+                                                className="bg-accent text-accent-foreground px-6 py-2 rounded-lg font-bold hover:bg-accent/90 hover:text-accent-foreground transition-all border border-accent shadow-md hover:shadow-lg w-full sm:w-auto"
                                             >
                                                 {t('withdrawBalance')}
                                             </Button>
@@ -128,41 +128,41 @@ export default function DashboardPage() {
 
                             {/* TABEL TRANSAKSI */}
                             <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
-                                <div className="px-6 py-4 border-b border-border">
+                                <div className="px-4 sm:px-6 py-4 border-b border-border">
                                     <h3 className="font-bold text-card-foreground">{t('transactionHistory')}</h3>
                                 </div>
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-sm text-left">
+                                <div className="overflow-x-auto -mx-2 sm:mx-0 px-2 sm:px-0">
+                                    <table className="w-full text-sm text-left min-w-[600px]">
                                         <thead className="bg-muted text-muted-foreground">
                                             <tr>
-                                                <th className="px-6 py-3">{t('id')}</th>
-                                                <th className="px-6 py-3">{t('time')}</th>
-                                                <th className="px-6 py-3">{t('invoice')}</th>
-                                                <th className="px-6 py-3">{t('received')}</th>
-                                                <th className="px-6 py-3">{t('status')}</th>
-                                                <th className="px-6 py-3 text-center">{t('action')}</th>
+                                                <th className="px-4 sm:px-6 py-3">{t('id')}</th>
+                                                <th className="px-4 sm:px-6 py-3">{t('time')}</th>
+                                                <th className="px-4 sm:px-6 py-3">{t('invoice')}</th>
+                                                <th className="px-4 sm:px-6 py-3">{t('received')}</th>
+                                                <th className="px-4 sm:px-6 py-3">{t('status')}</th>
+                                                <th className="px-4 sm:px-6 py-3 text-center">{t('action')}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {data.transactions.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan={6} className="px-6 py-8 text-center text-muted-foreground">
+                                                    <td colSpan={6} className="px-4 sm:px-6 py-8 text-center text-muted-foreground">
                                                         {t('noTransactions')}
                                                     </td>
                                                 </tr>
                                             ) : (
                                                 data.transactions.map((tx) => (
                                                     <tr key={tx.id} className="border-b last:border-0 hover:bg-muted/50">
-                                                        <td className="px-6 py-4 text-muted-foreground font-mono text-xs">
+                                                        <td className="px-4 sm:px-6 py-4 text-muted-foreground font-mono text-xs">
                                                             {tx.id.slice(0, 8)}...
                                                         </td>
-                                                        <td className="px-6 py-4 text-muted-foreground">
+                                                        <td className="px-4 sm:px-6 py-4 text-muted-foreground">
                                                             {new Date(tx.createdAt).toLocaleString(locale)}
                                                         </td>
-                                                        <td className="px-6 py-4 font-medium text-card-foreground">
+                                                        <td className="px-4 sm:px-6 py-4 font-medium text-card-foreground">
                                                             Rp {Math.floor(parseFloat(tx?.amountInvoice?.toString() || '0')).toLocaleString(locale)}
                                                         </td>
-                                                        <td className="px-6 py-4 font-medium text-card-foreground">
+                                                        <td className="px-4 sm:px-6 py-4 font-medium text-card-foreground">
                                                             {(() => {
                                                                 let amountReceivedIdr = parseFloat(tx.amountReceivedIdr.toString());
                                                                 const tipIdr = parseFloat(tx.tipIdr.toString())
@@ -180,7 +180,7 @@ export default function DashboardPage() {
                                                                 )
                                                             })()}
                                                         </td>
-                                                        <td className="px-6 py-4">
+                                                        <td className="px-4 sm:px-6 py-4">
                                                             {(() => {
                                                                 const status = tx.status
                                                                 const isSuccess = status === 'PAID' || status === 'OVERPAID'
@@ -206,7 +206,7 @@ export default function DashboardPage() {
                                                                 )
                                                             })()}
                                                         </td>
-                                                        <td className="px-6 py-4 text-center">
+                                                        <td className="px-4 sm:px-6 py-4 text-center">
                                                             <Link href={`/invoice/${tx.id}`}>
                                                                 <Button
                                                                     variant="ghost"

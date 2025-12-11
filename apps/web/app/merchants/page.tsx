@@ -45,7 +45,7 @@ export default function MerchantsPage() {
     return (
         <ProtectedRoute>
             <DashboardLayout>
-                <div className="p-6 space-y-4">
+                <div className="px-3 sm:px-6 py-6 space-y-4 max-w-full overflow-x-hidden">
                     <div>
                         <h1 className="text-2xl font-bold text-foreground">{tm('title', { defaultValue: 'Merchants' })}</h1>
                         <p className="text-muted-foreground text-sm">{tm('subtitle', { defaultValue: 'All merchants list' })}</p>
@@ -58,8 +58,8 @@ export default function MerchantsPage() {
                     ) : data.length === 0 ? (
                         <p className="text-muted-foreground text-sm">{tm('empty', { defaultValue: 'No merchants found.' })}</p>
                     ) : (
-                        <div className="overflow-x-auto bg-card border border-border rounded-lg">
-                            <table className="w-full text-sm text-left">
+                        <div className="overflow-x-auto bg-card border border-border rounded-lg -mx-2 sm:mx-0 px-2 sm:px-0">
+                            <table className="w-full text-sm text-left min-w-[600px]">
                                 <thead className="bg-muted text-muted-foreground">
                                     <tr>
                                         <th className="px-4 py-3">ID</th>

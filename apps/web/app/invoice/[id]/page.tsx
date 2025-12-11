@@ -105,7 +105,7 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
     ]
 
     return (
-        <div className="min-h-screen bg-primary text-primary-foreground flex flex-col items-center justify-center p-3">
+        <div className="min-h-screen bg-primary text-primary-foreground flex flex-col items-center justify-center px-3 py-4 sm:py-6 w-full max-w-full overflow-x-hidden">
             <div className="w-full max-w-md sm:max-w-lg bg-card text-card-foreground rounded-xl shadow-xl overflow-hidden flex flex-col max-h-[95vh] border border-border">
 
                 {/* Header Dinamis */}

@@ -71,32 +71,32 @@ export default function AccountPage() {
     return (
         <ProtectedRoute>
             <DashboardLayout>
-                <div className="p-6">
+                <div className="px-3 sm:px-6 py-6 max-w-full overflow-x-hidden">
                     <h1 className="text-2xl font-bold mb-4 text-foreground">{t('title')}</h1>
                     {user ? (
-                        <div className="bg-card rounded-lg shadow-sm border border-border p-6 space-y-4">
-                            <div>
+                        <div className="bg-card rounded-lg shadow-sm border border-border p-4 sm:p-6 space-y-4">
+                            <div className="space-y-1">
                                 <label className="text-sm font-medium text-muted-foreground">{t('name')}</label>
-                                <p className="text-lg font-semibold text-card-foreground">{user.name}</p>
+                                <p className="text-lg sm:text-xl font-semibold text-card-foreground break-words">{user.name}</p>
                             </div>
-                            <div>
+                            <div className="space-y-1">
                                 <label className="text-sm font-medium text-muted-foreground">{t('email')}</label>
-                                <p className="text-lg text-card-foreground">{user.email}</p>
+                                <p className="text-lg sm:text-xl text-card-foreground break-words">{user.email}</p>
                             </div>
-                            <div>
+                            <div className="space-y-1">
                                 <label className="text-sm font-medium text-muted-foreground">{t('balance')}</label>
-                                <p className="text-lg font-semibold text-green-600">
+                                <p className="text-lg sm:text-xl font-semibold text-green-600">
                                     Rp {parseInt(user.balanceIDR || '0').toLocaleString(locale)}
                                 </p>
                             </div>
                             {user.bankName && (
-                                <div>
+                                <div className="space-y-1">
                                     <label className="text-sm font-medium text-muted-foreground">{t('bank')}</label>
                                     <p className="text-lg text-card-foreground">{user.bankName}</p>
                                 </div>
                             )}
                             {user.bankAccount && (
-                                <div>
+                                <div className="space-y-1">
                                     <label className="text-sm font-medium text-muted-foreground">{t('accountNumber')}</label>
                                     <p className="text-lg text-card-foreground font-mono">{user.bankAccount}</p>
                                 </div>
@@ -109,8 +109,8 @@ export default function AccountPage() {
                     )}
 
                     {/* Payout Requests */}
-                    <div className="mt-8 bg-card rounded-lg shadow-sm border border-border p-6">
-                        <div className="flex items-center justify-between mb-4">
+                    <div className="mt-8 bg-card rounded-lg shadow-sm border border-border p-4 sm:p-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
                             <div>
                                 <h2 className="text-lg font-semibold text-card-foreground">{t('payoutSectionTitle')}</h2>
                                 <p className="text-sm text-muted-foreground">{t('payoutSectionSubtitle')}</p>
@@ -122,27 +122,27 @@ export default function AccountPage() {
                         ) : payouts.length === 0 ? (
                             <p className="text-muted-foreground text-sm">{t('payoutEmpty')}</p>
                         ) : (
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-sm text-left">
+                            <div className="overflow-x-auto -mx-2 sm:mx-0 px-2 sm:px-0">
+                                <table className="w-full text-sm text-left min-w-[560px]">
                                     <thead className="bg-muted text-muted-foreground">
                                         <tr>
-                                            <th className="px-4 py-2">{t('payoutTableDate')}</th>
-                                            <th className="px-4 py-2">{t('payoutTableRequested')}</th>
-                                            <th className="px-4 py-2">{t('payoutTableFinal')}</th>
-                                            <th className="px-4 py-2">{t('payoutTableStatus')}</th>
-                                            <th className="px-4 py-2">{t('payoutTableReference')}</th>
+                                            <th className="px-3 sm:px-4 py-2">{t('payoutTableDate')}</th>
+                                            <th className="px-3 sm:px-4 py-2">{t('payoutTableRequested')}</th>
+                                            <th className="px-3 sm:px-4 py-2">{t('payoutTableFinal')}</th>
+                                            <th className="px-3 sm:px-4 py-2">{t('payoutTableStatus')}</th>
+                                            <th className="px-3 sm:px-4 py-2">{t('payoutTableReference')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {payouts.map((payout) => (
                                             <tr key={payout.id} className="border-b last:border-0">
-                                                <td className="px-4 py-2 text-muted-foreground">
+                                                <td className="px-3 sm:px-4 py-2 text-muted-foreground">
                                                     {new Date(payout.createdAt).toLocaleString(locale)}
                                                 </td>
-                                                <td className="px-4 py-2 text-card-foreground font-medium">
+                                                <td className="px-3 sm:px-4 py-2 text-card-foreground font-medium">
                                                     {formatRp(payout.amountRequested)}
                                                 </td>
-                                                <td className="px-4 py-2 text-card-foreground">
+                                                <td className="px-3 sm:px-4 py-2 text-card-foreground">
                                                     <div className="flex flex-col">
                                                         <span className="font-semibold">{formatRp(payout.amountFinal)}</span>
                                                         <span className="text-xs text-muted-foreground">
@@ -150,10 +150,10 @@ export default function AccountPage() {
                                                         </span>
                                                     </div>
                                                 </td>
-                                                <td className="px-4 py-2">
+                                                <td className="px-3 sm:px-4 py-2">
                                                     {renderStatusBadge(payout.status)}
                                                 </td>
-                                                <td className="px-4 py-2 text-muted-foreground">
+                                                <td className="px-3 sm:px-4 py-2 text-muted-foreground break-words">
                                                     {payout.referenceNo || payout.rejectionReason || '-'}
                                                 </td>
                                             </tr>
