@@ -9,6 +9,7 @@ import { useAuth } from '../../src/store/useAuth'
 import ProtectedRoute from '../../components/ProtectedRoute'
 import { DashboardLayout } from '../../components/DashboardLayout'
 import { CreateInvoiceModal } from '../../components/dashboard/CreateInvoiceModal'
+import { RequestPayoutModal } from '../../components/dashboard/RequestPayoutModal'
 import { Button } from '@/components/ui/button'
 import { TipBadge } from '@/components/common/TipBadge'
 
@@ -111,13 +112,17 @@ export default function DashboardPage() {
                                             </Button>
                                         }
                                     />
-                                    <Button
-                                        variant="outline"
-                                        size="lg"
-                                        className="bg-accent text-accent-foreground px-6 py-2 rounded-lg font-bold hover:bg-accent/90 hover:text-accent-foreground transition-all border border-accent shadow-md hover:shadow-lg"
-                                    >
-                                        {t('withdrawBalance')}
-                                    </Button>
+                                    <RequestPayoutModal
+                                        trigger={
+                                            <Button
+                                                variant="outline"
+                                                size="lg"
+                                                className="bg-accent text-accent-foreground px-6 py-2 rounded-lg font-bold hover:bg-accent/90 hover:text-accent-foreground transition-all border border-accent shadow-md hover:shadow-lg"
+                                            >
+                                                {t('withdrawBalance')}
+                                            </Button>
+                                        }
+                                    />
                                 </div>
                             </div>
 
@@ -159,32 +164,47 @@ export default function DashboardPage() {
                                                         </td>
                                                         <td className="px-6 py-4 font-medium text-card-foreground">
                                                             {(() => {
-                                                                const amountInvoice = parseFloat(tx.amountInvoice.toString())
+                                                                let amountReceivedIdr = parseFloat(tx.amountReceivedIdr.toString());
                                                                 const tipIdr = parseFloat(tx.tipIdr.toString())
 
-                                                                if (tx.status === 'PENDING' || tx.status === 'PARTIALLY_PAID') {
-                                                                    return 'Rp 0'
+                                                                if (tx.status === 'PAID' || tx.status === 'OVERPAID') {
+                                                                    amountReceivedIdr = parseFloat(tx.amountInvoice.toString())
                                                                 }
 
-                                                                // Merchant menerima amountInvoice + tip jika overpaid
-                                                                const merchantReceived = amountInvoice + tipIdr
+                                                                const merchantReceived = amountReceivedIdr + tipIdr
                                                                 return (
                                                                     <div className="flex items-center gap-1">
-                                                                        <span>Rp {Math.floor(merchantReceived).toLocaleString(locale)}</span>
+                                                                        <span>Rp {merchantReceived.toLocaleString(locale)}</span>
                                                                         <TipBadge tipIdr={tipIdr} />
                                                                     </div>
                                                                 )
                                                             })()}
                                                         </td>
                                                         <td className="px-6 py-4">
-                                                            <span className={`px-2 py-1 rounded-full text-xs font-bold ${tx.status === 'PAID' || tx.status === 'OVERPAID'
-                                                                ? 'bg-green-100 text-green-700'
-                                                                : tx.status === 'PENDING'
-                                                                    ? 'bg-yellow-100 text-yellow-700'
-                                                                    : 'bg-red-100 text-red-700'
-                                                                }`}>
-                                                                {tx.status}
-                                                            </span>
+                                                            {(() => {
+                                                                const status = tx.status
+                                                                const isSuccess = status === 'PAID' || status === 'OVERPAID'
+                                                                const isPending = status === 'PENDING' || status === 'PARTIALLY_PAID'
+
+                                                                const labelMap: Record<string, string> = {
+                                                                    PENDING: t('statusPending'),
+                                                                    OVERPAID: t('statusOverpaid'),
+                                                                    PAID: t('statusPaid'),
+                                                                    PARTIALLY_PAID: t('statusPartiallyPaid'),
+                                                                }
+
+                                                                const badgeClass = isSuccess
+                                                                    ? 'bg-green-100 text-green-700'
+                                                                    : isPending
+                                                                        ? 'bg-yellow-100 text-yellow-700'
+                                                                        : 'bg-red-100 text-red-700'
+
+                                                                return (
+                                                                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${badgeClass}`}>
+                                                                        {labelMap[status]}
+                                                                    </span>
+                                                                )
+                                                            })()}
                                                         </td>
                                                         <td className="px-6 py-4 text-center">
                                                             <Link href={`/invoice/${tx.id}`}>

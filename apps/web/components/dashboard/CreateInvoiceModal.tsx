@@ -91,13 +91,16 @@ export function CreateInvoiceModal({
                             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">Rp</span>
                             <Input
                                 id="amount"
-                                type="number"
-                                value={amount}
-                                onChange={(e) => setAmount(e.target.value)}
+                                type="text"
+                                value={amount ? Number(amount.replace(/\D/g, '') || '0').toLocaleString('id-ID') : ''}
+                                onChange={(e) => {
+                                    const raw = e.target.value.replace(/\D/g, '')
+                                    setAmount(raw)
+                                }}
                                 className="pl-12 text-lg font-semibold h-12"
                                 placeholder="0"
                                 required
-                                min="10000"
+                                inputMode="numeric"
                                 disabled={loading}
                                 autoFocus
                             />

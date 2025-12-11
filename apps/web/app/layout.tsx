@@ -76,9 +76,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="light">
-      <body
-        className={`${inter.variable} antialiased bg-background`}
-      >
+      <body className={`${inter.variable} antialiased bg-background`} suppressHydrationWarning>
         {children}
         <Toaster />
       </body>

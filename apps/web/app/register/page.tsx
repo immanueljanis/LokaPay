@@ -114,7 +114,7 @@ export default function RegisterPage() {
                                 src="/logo/logoWithTextTransparent.png"
                                 alt="LokaPay Logo"
                                 fill
-                                className="object-contain scale-150 md:scale-[1.75]"
+                                className="object-contain scale-150 md:scale-[1]"
                                 priority
                             />
                         </div>

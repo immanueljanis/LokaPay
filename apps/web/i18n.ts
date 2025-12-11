@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 
 export const locales = ['en', 'id', 'zh'] as const;
 export type Locale = (typeof locales)[number];
-export const defaultTimeZone = 'Asia/Jakarta';
 
 export const defaultLocales: Record<string, Locale> = {
     '/dashboard': 'id',
@@ -24,7 +23,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
     return {
         locale,
         messages: (await import(`./messages/${locale}.json`)).default,
-        timeZone: defaultTimeZone
+        timeZone: 'Asia/Jakarta'
     };
 });
 

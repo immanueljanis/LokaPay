@@ -75,12 +75,12 @@ export default function LoginPage() {
                 <div className="bg-card/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-border/50 p-8 md:p-10">
                     {/* Logo */}
                     <div className="flex justify-center mb-8">
-                        <div className="relative w-full max-w-xs md:max-w-sm aspect-[4/1]">
+                        <div className="relative w-full max-w-xs md:max-w-sm aspect-[3/1]">
                             <Image
                                 src="/logo/logoWithTextTransparent.png"
                                 alt="LokaPay Logo"
                                 fill
-                                className="object-contain scale-150 md:scale-[1.75]"
+                                className="object-contain scale-150 md:scale-[1]"
                                 priority
                             />
                         </div>

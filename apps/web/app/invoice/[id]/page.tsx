@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { TipBadge } from '@/components/common/TipBadge'
 import { Copy, Check } from 'lucide-react'
 import { useTranslations, useLocale } from 'next-intl'
+import { generateEIP681AddressURI } from '../../../src/constants/network'
 
 export const dynamic = 'force-dynamic'
 
@@ -90,6 +91,10 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
         hour: '2-digit',
         minute: '2-digit'
     }) : null
+
+    const eip681URI = tx.paymentAddress
+        ? generateEIP681AddressURI(tx.paymentAddress)
+        : tx.paymentReference || ''
 
     return (
         <div className="min-h-screen bg-primary text-primary-foreground flex flex-col items-center justify-center p-3">
@@ -224,7 +229,7 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
                             </div>
 
                             <div className="bg-card p-2 rounded-lg border border-border">
-                                <QRCode value={tx.paymentAddress || tx.paymentReference || ''} size={150} />
+                                <QRCode value={eip681URI} size={150} />
                             </div>
 
                             <div className="mt-2 text-center w-full space-y-2">

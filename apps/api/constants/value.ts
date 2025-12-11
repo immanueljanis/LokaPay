@@ -1,5 +1,6 @@
 export const TRANSACTION_FEE = 0.015;
 export const SPREAD_VALUE = 0.015;
+export const ADMIN_TRANSFER_PERCENTAGE = 0.035;
 
 export default function BANK_OPTIONS() {
     return [

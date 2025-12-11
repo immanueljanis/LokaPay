@@ -1,1 +1,1 @@
-export const BUFFER_AMOUNT_PAID_OVERPAID = 0;
+export const BUFFER_AMOUNT_PAID_OVERPAID = 0.001;

@@ -7,19 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Enum untuk status transaksi (State Machine)
-enum TransactionStatus {
-  PENDING         // Invoice dibuat, menunggu pembayaran
-  DETECTED        // Pembayaran terdeteksi di mempool/blockchain (belum confirm)
-  PARTIALLY_PAID  // Kurang bayar, boleh tambah lagi
-  CONFIRMED       // Sudah confirmed di blockchain (Sukses sisi Crypto)
-  PAID            // Sudah dikonversi ke IDR & masuk saldo Merchant (Sukses Total)
-  OVERPAID        // Lebih bayar
-  EXPIRED         // User telat bayar
-  FAILED          // Gagal (kurang bayar / error network)
-  REFUNDED        // Dana dikembalikan (manual case)
-}
-
 model Merchant {
   id            String   @id @default(uuid())
   email         String   @unique
@@ -28,16 +15,44 @@ model Merchant {
   walletAddress String?  // Alamat wallet pribadi merchant (opsional untuk MVP)
   bankName      String?  // Contoh: BCA
   bankAccount   String?  // Contoh: 1234567890
+  bankHolder    String?
   
   // Saldo Virtual (Rupiah)
   balanceIDR    Decimal  @default(0) @db.Decimal(18, 2)
 
+  transactions  Transaction[]
+  payouts       Payout[]
+
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  transactions  Transaction[]
-
   @@map("merchants")
+}
+
+model Payout {
+  id            String       @id @default(uuid())
+  
+  merchantId    String
+  merchant      Merchant     @relation(fields: [merchantId], references: [id])
+  
+  amountRequested Decimal    @db.Decimal(18, 2) 
+  feeAdmin        Decimal    @db.Decimal(18, 2) 
+  amountFinal     Decimal    @db.Decimal(18, 2)
+  
+  toBankName      String
+  toBankAccount   String
+  toBankHolder    String
+
+  status          PayoutStatus @default(REQUESTED)
+  
+  proofImage      String?
+  referenceNo     String?
+  rejectionReason String?
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@map("payouts")
 }
 
 model Transaction {
@@ -93,4 +108,23 @@ model RateHistory {
   timestamp DateTime @default(now())
 
   @@map("rates")
+}
+
+enum TransactionStatus {
+  PENDING         
+  DETECTED        
+  PARTIALLY_PAID  
+  CONFIRMED       
+  PAID            
+  OVERPAID        
+  EXPIRED
+  FAILED
+  REFUNDED
+}
+
+enum PayoutStatus {
+  REQUESTED   
+  COMPLETED
+  REJECTED    
+  FAILED
 }
