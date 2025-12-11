@@ -17,6 +17,7 @@
     "@gelatonetwork/relay-sdk": "^5.6.0",
     "ethers": "^6.15.0",
     "hono": "^4.10.7",
+    "hono-rate-limiter": "^0.4.2",
     "jose": "^6.1.3"
   }
 }
