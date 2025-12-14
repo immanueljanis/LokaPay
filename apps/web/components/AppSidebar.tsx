@@ -42,14 +42,14 @@ export function AppSidebar() {
 
     return (
         <Sidebar>
-            <SidebarHeader className="border-b border-sidebar-border px-4 py-6">
-                <div className="flex flex-col items-center gap-4 pt-4">
+            <SidebarHeader className="border-b border-sidebar-border">
+                <div className="flex flex-col items-center gap-2 pt-2">
                     <Image
-                        src="/logo/logoWithTextTransparent.png"
+                        src="/logo/logoWithSloganWhiteTransparent.png"
                         alt="LokaPay"
                         width={1000}
                         height={1000}
-                        className="w-32 object-contain"
+                        className="w-48 object-contain"
                         priority
                     />
                     <p className="text-xs text-muted-foreground italic tracking-wide">
