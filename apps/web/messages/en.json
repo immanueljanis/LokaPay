@@ -168,6 +168,30 @@
     "rejectedSuccess": "Payout rejected",
     "requestFailed": "Request failed"
   },
+  "transactions": {
+    "title": "Transactions",
+    "subtitle": "All transaction history",
+    "loading": "Loading transactions...",
+    "empty": "No transactions found.",
+    "requestFailed": "Failed to fetch transactions.",
+    "id": "ID",
+    "merchant": "Merchant",
+    "invoice": "Invoice",
+    "received": "Received",
+    "status": "Status",
+    "network": "Network",
+    "txHash": "Transaction Hash",
+    "created": "Created",
+    "statusPENDING": "Pending",
+    "statusDETECTED": "Detected",
+    "statusPARTIALLY_PAID": "Partially Paid",
+    "statusCONFIRMED": "Confirmed",
+    "statusPAID": "Paid",
+    "statusOVERPAID": "Overpaid",
+    "statusEXPIRED": "Expired",
+    "statusFAILED": "Failed",
+    "statusREFUNDED": "Refunded"
+  },
   "home": {
     "backToDashboard": "Back to Dashboard",
     "createQrCode": "Create QR Code"

@@ -168,6 +168,30 @@
     "rejectedSuccess": "Pencairan berhasil ditolak",
     "requestFailed": "Permintaan gagal"
   },
+  "transactions": {
+    "title": "Transaksi",
+    "subtitle": "Riwayat semua transaksi",
+    "loading": "Memuat transaksi...",
+    "empty": "Belum ada transaksi.",
+    "requestFailed": "Gagal memuat transaksi.",
+    "id": "ID",
+    "merchant": "Merchant",
+    "invoice": "Tagihan",
+    "received": "Diterima",
+    "status": "Status",
+    "network": "Jaringan",
+    "txHash": "Hash Transaksi",
+    "created": "Dibuat",
+    "statusPENDING": "Menunggu",
+    "statusDETECTED": "Terdeteksi",
+    "statusPARTIALLY_PAID": "Bayar Sebagian",
+    "statusCONFIRMED": "Terkonfirmasi",
+    "statusPAID": "Lunas",
+    "statusOVERPAID": "Lebih Bayar",
+    "statusEXPIRED": "Kedaluwarsa",
+    "statusFAILED": "Gagal",
+    "statusREFUNDED": "Dikembalikan"
+  },
   "home": {
     "backToDashboard": "Kembali ke Dashboard",
     "createQrCode": "Buat QR Code"

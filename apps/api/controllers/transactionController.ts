@@ -47,3 +47,12 @@ export const getTransactionController = async (c: any) => {
     return successResponse(c, transaction, 'Transaction retrieved successfully')
 }
 
+export const listTransactionsController = async (c: any) => {
+    try {
+        const transactions = await transactionService.listAll()
+        return successResponse(c, transactions, 'Transactions retrieved successfully')
+    } catch (e: any) {
+        return errorResponse(c, e.message || 'Failed to retrieve transactions', 400)
+    }
+}
+

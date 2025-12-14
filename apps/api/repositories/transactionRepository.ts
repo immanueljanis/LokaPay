@@ -22,5 +22,21 @@ export const transactionRepository = {
     findById: (id: string) => {
         return prisma.transaction.findUnique({ where: { id } })
     },
+
+    findAllWithMerchant: async () => {
+        return prisma.transaction.findMany({
+            include: {
+                merchant: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                    },
+                },
+            },
+            orderBy: { createdAt: 'desc' },
+            take: 100,
+        })
+    },
 }
 

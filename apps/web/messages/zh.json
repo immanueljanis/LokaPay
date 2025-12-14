@@ -168,6 +168,30 @@
     "rejectedSuccess": "提现已拒绝",
     "requestFailed": "请求失败"
   },
+  "transactions": {
+    "title": "交易",
+    "subtitle": "所有交易历史",
+    "loading": "正在加载交易...",
+    "empty": "没有交易。",
+    "requestFailed": "获取交易失败。",
+    "id": "ID",
+    "merchant": "商户",
+    "invoice": "发票",
+    "received": "已收到",
+    "status": "状态",
+    "network": "网络",
+    "txHash": "交易哈希",
+    "created": "创建时间",
+    "statusPENDING": "待处理",
+    "statusDETECTED": "已检测",
+    "statusPARTIALLY_PAID": "部分付款",
+    "statusCONFIRMED": "已确认",
+    "statusPAID": "已付款",
+    "statusOVERPAID": "超额付款",
+    "statusEXPIRED": "已过期",
+    "statusFAILED": "失败",
+    "statusREFUNDED": "已退款"
+  },
   "home": {
     "backToDashboard": "返回仪表板",
     "createQrCode": "创建二维码"

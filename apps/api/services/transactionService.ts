@@ -54,5 +54,9 @@ export const transactionService = {
     getById: async (id: string) => {
         return transactionRepository.findById(id)
     },
+
+    listAll: async () => {
+        return transactionRepository.findAllWithMerchant()
+    },
 }
 
