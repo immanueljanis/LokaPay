@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, use } from 'react'
+import { useEffect, useState, use, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { api } from '../../../lib/axios.instance'
 import QRCode from 'react-qr-code'
@@ -9,6 +9,7 @@ import { TipBadge } from '@/components/common/TipBadge'
 import { Copy, Check } from 'lucide-react'
 import { useTranslations, useLocale } from 'next-intl'
 import { generateEIP681AddressURI } from '../../../src/constants/network'
+import { useSoundFeedback } from '@/hooks/useSound'
 
 export const dynamic = 'force-dynamic'
 
@@ -42,6 +43,9 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
     const tc = useTranslations('common')
     const locale = useLocale()
 
+    const { playSuccess } = useSoundFeedback()
+    const hasPlayedRef = useRef(false)
+
     const [tx, setTx] = useState<Transaction | null>(null)
     const [loading, setLoading] = useState(true)
     const [copied, setCopied] = useState(false)
@@ -65,6 +69,14 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
         }, 5000)
         return () => clearInterval(interval)
     }, [id])
+
+    useEffect(() => {
+        if (tx?.status === 'PAID' && !hasPlayedRef.current) {
+            playSuccess();
+            hasPlayedRef.current = true;
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+        }
+    }, [tx?.status, playSuccess]);
 
     if (loading && !tx) return <div className="p-10 text-center">{t('loading')}</div>
 
