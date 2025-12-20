@@ -25,7 +25,7 @@ export const successResponse = <T = any>(
 export const errorResponse = (
     c: Context,
     message: string = 'An error occurred',
-    status: 400 | 401 | 403 | 404 | 500 = 400
+    status: 400 | 401 | 403 | 404 | 410 | 500 = 400
 ) => {
     return c.json<ApiResponse<null>>(
         {

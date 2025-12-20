@@ -76,10 +76,11 @@ model Transaction {
   tipIdr          Decimal           @default(0) @db.Decimal(18, 2) // Tip jika overpaid (dalam IDR)
   feeApp          Decimal           @default(0) @db.Decimal(18, 2) // Fee aplikasi (1.5% dari amountInvoice)
   
-  paymentAddress  String            @unique            // Alamat Vault (Hasil CREATE2)
-  salt            String?           @unique            // PENGGANTI Private Key (UUID)
-  isDeployed      Boolean           @default(false)    // Status apakah contract sudah dideploy
-  gelatoTaskId    String?                              // ID Task Relayer
+  paymentAddress  String            @unique            
+  salt            String?           @unique            
+  shortCode       String?           @unique            
+  isDeployed      Boolean           @default(false)    
+  gelatoTaskId    String?
   
   // Detail Blockchain
   network         String            @default("MANTLE") // Chain: MANTLE, BSC, TRON
@@ -98,6 +99,7 @@ model Transaction {
 
   @@index([status])
   @@index([paymentAddress])
+  @@index([shortCode])
   @@map("transactions")
 }
 

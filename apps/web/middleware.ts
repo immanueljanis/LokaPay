@@ -3,7 +3,8 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { locales, defaultLocales } from './i18n'
 
-const protectedRoutes = ['/dashboard', '/account', '/invoice']
+const protectedRoutes = ['/dashboard', '/account']
+const publicRoutes = ['/invoice', '/pay']
 
 const intlMiddleware = createMiddleware({
     locales,
@@ -14,15 +15,12 @@ const intlMiddleware = createMiddleware({
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl
 
-    // Extract locale from pathname
     const pathnameWithoutLocale = pathname.replace(/^\/(en|id|zh)/, '') || '/'
     const localeMatch = pathname.match(/^\/(en|id|zh)/)
     const currentLocale = localeMatch ? localeMatch[1] : null
 
-    // Determine default locale based on route
     let defaultLocale = 'en'
 
-    // Special case: invoice detail should default to English
     if (pathnameWithoutLocale.startsWith('/invoice/')) {
         defaultLocale = 'en'
     } else {
@@ -34,15 +32,15 @@ export function middleware(request: NextRequest) {
         }
     }
 
-    // If no locale in pathname, redirect to default locale for that route
     if (!currentLocale) {
         const newPath = `/${defaultLocale}${pathnameWithoutLocale === '/' ? '' : pathnameWithoutLocale}`
         return NextResponse.redirect(new URL(newPath, request.url))
     }
 
-    // Check protected routes (without locale prefix)
+    const isPublicRoute = publicRoutes.some(route => pathnameWithoutLocale.startsWith(route))
+
     const isProtectedRoute = protectedRoutes.some(route => pathnameWithoutLocale.startsWith(route))
-    if (isProtectedRoute) {
+    if (isProtectedRoute && !isPublicRoute) {
         const token = request.cookies.get('lokapay-token')
 
         if (!token) {
@@ -52,7 +50,6 @@ export function middleware(request: NextRequest) {
         }
     }
 
-    // Redirect logged-in users away from login page
     if (pathnameWithoutLocale === '/login') {
         const token = request.cookies.get('lokapay-token')
         if (token) {

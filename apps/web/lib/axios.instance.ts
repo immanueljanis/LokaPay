@@ -48,8 +48,10 @@ axiosInstance.interceptors.response.use(
                 case 401:
                     const requestUrl = error.config?.url || ''
                     const isLoginEndpoint = requestUrl.includes('/auth/login')
+                    const isPublicEndpoint = requestUrl.includes('/transaction/') && requestUrl.includes('/public')
+                    const isPaymentLink = requestUrl.includes('/pay/')
 
-                    if (typeof window !== 'undefined' && !isLoginEndpoint) {
+                    if (typeof window !== 'undefined' && !isLoginEndpoint && !isPublicEndpoint && !isPaymentLink) {
                         cookies.remove('lokapay-token')
                         localStorage.removeItem('lokapay-session')
                         window.location.href = '/login'

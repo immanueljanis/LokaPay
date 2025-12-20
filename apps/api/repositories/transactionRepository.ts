@@ -13,6 +13,7 @@ export const transactionRepository = {
         network: string
         paymentAddress: string
         salt: string
+        shortCode?: string
         isDeployed: boolean
         expiresAt: Date
     }) => {
@@ -21,6 +22,10 @@ export const transactionRepository = {
 
     findById: (id: string) => {
         return prisma.transaction.findUnique({ where: { id } })
+    },
+
+    findByShortCode: (shortCode: string) => {
+        return prisma.transaction.findUnique({ where: { shortCode } })
     },
 
     findAllWithMerchant: async () => {

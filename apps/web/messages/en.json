@@ -97,6 +97,8 @@
     "received": "Received:",
     "remaining": "Remaining:",
     "paymentAddress": "Payment Address:",
+    "paymentLink": "Payment Link",
+    "copyLink": "Copy payment link",
     "network": "Network:",
     "expiresAt": "Expires at:",
     "waitingForPayment": "Waiting for payment...",

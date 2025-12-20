@@ -47,6 +47,40 @@ export const getTransactionController = async (c: any) => {
     return successResponse(c, transaction, 'Transaction retrieved successfully')
 }
 
+export const getTransactionByShortCodeController = async (c: any) => {
+    try {
+        const shortCode = c.req.param('shortCode')
+
+        if (!shortCode || shortCode.length !== 6) {
+            return errorResponse(c, 'Invalid short code', 400)
+        }
+
+        const transaction = await transactionService.getByShortCode(shortCode)
+        if (!transaction) {
+            return errorResponse(c, 'Transaction not found', 404)
+        }
+
+        return successResponse(c, transaction, 'Transaction retrieved successfully')
+    } catch (e: any) {
+        return errorResponse(c, e.message || 'Failed to retrieve transaction', 500)
+    }
+}
+
+export const getTransactionPublicController = async (c: any) => {
+    try {
+        const id = c.req.param('id')
+        const transaction = await transactionService.getById(id)
+
+        if (!transaction) {
+            return errorResponse(c, 'Transaction not found', 404)
+        }
+
+        return successResponse(c, transaction, 'Transaction retrieved successfully')
+    } catch (e: any) {
+        return errorResponse(c, e.message || 'Failed to retrieve transaction', 500)
+    }
+}
+
 export const listTransactionsController = async (c: any) => {
     try {
         const transactions = await transactionService.listAll()

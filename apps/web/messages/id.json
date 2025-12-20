@@ -97,6 +97,8 @@
     "received": "Diterima:",
     "remaining": "Sisa:",
     "paymentAddress": "Alamat Pembayaran:",
+    "paymentLink": "Tautan Pembayaran",
+    "copyLink": "Salin tautan pembayaran",
     "network": "Jaringan:",
     "expiresAt": "Kedaluwarsa pada:",
     "waitingForPayment": "Menunggu pembayaran...",

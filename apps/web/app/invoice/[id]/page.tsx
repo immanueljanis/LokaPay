@@ -3,6 +3,7 @@
 import { useEffect, useState, use, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { api } from '../../../lib/axios.instance'
+import axios from 'axios'
 import QRCode from 'react-qr-code'
 import { Button } from '@/components/ui/button'
 import { TipBadge } from '@/components/common/TipBadge'
@@ -16,6 +17,7 @@ export const dynamic = 'force-dynamic'
 // Tipe Data Transaksi
 type Transaction = {
     id: string
+    shortCode?: string | null
     // Field Invoice
     amountInvoice: string | number
     amountUSDT: string | number
@@ -49,12 +51,40 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
     const [tx, setTx] = useState<Transaction | null>(null)
     const [loading, setLoading] = useState(true)
     const [copied, setCopied] = useState(false)
+    const [copiedLink, setCopiedLink] = useState(false)
     const [tipAmount, setTipAmount] = useState<number>(0)
 
     const fetchStatus = async () => {
         try {
-            const transaction = await api.get<Transaction>(`/transaction/${id}`)
-            setTx(transaction)
+            // Check if user has token, if not use public endpoint directly
+            const token = typeof window !== 'undefined'
+                ? document.cookie.split('; ').find(row => row.startsWith('lokapay-token='))?.split('=')[1]
+                : null
+
+            if (token) {
+                // Try authenticated endpoint first (for merchants)
+                try {
+                    const transaction = await api.get<Transaction>(`/transaction/${id}`)
+                    setTx(transaction)
+                    return
+                } catch (authErr: any) {
+                    if (authErr?.response?.status === 401 || authErr?.response?.status === 403) {
+                    } else {
+                        throw authErr
+                    }
+                }
+            }
+
+            // Use public endpoint (no auth required)
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+            const response = await axios.get<{ success: boolean; data: Transaction; message: string }>(
+                `${apiUrl}/transaction/${id}/public`
+            )
+            if (response.data.success) {
+                setTx(response.data.data)
+            } else {
+                throw new Error(response.data.message)
+            }
         } catch (err) {
             console.error("Error polling:", err)
         } finally {
@@ -337,6 +367,45 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
                                         </p>
                                         <div className="text-xs font-semibold text-accent">
                                             {expiresAtFormatted}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {tx.shortCode && (
+                                    <div>
+                                        <p className="text-xs text-muted-foreground mb-0.5 uppercase tracking-wide">
+                                            {t('paymentLink') || 'Payment Link'}
+                                        </p>
+                                        <div className="bg-muted p-2 rounded-lg font-mono text-xs break-all border border-border flex items-center justify-between gap-2">
+                                            <span className="flex-1 text-left">
+                                                {typeof window !== 'undefined'
+                                                    ? `${window.location.origin}/pay/${tx.shortCode}`
+                                                    : `/pay/${tx.shortCode}`}
+                                            </span>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-6 w-6 p-0 flex-shrink-0 hover:bg-primary/10"
+                                                onClick={async () => {
+                                                    const paymentLink = typeof window !== 'undefined'
+                                                        ? `${window.location.origin}/pay/${tx.shortCode}`
+                                                        : `/pay/${tx.shortCode}`
+                                                    try {
+                                                        await navigator.clipboard.writeText(paymentLink)
+                                                        setCopiedLink(true)
+                                                        setTimeout(() => setCopiedLink(false), 2000)
+                                                    } catch (err) {
+                                                        console.error('Failed to copy:', err)
+                                                    }
+                                                }}
+                                                title={t('copyLink') || 'Copy Payment Link'}
+                                            >
+                                                {copiedLink ? (
+                                                    <Check className="h-3 w-3 text-green-500" />
+                                                ) : (
+                                                    <Copy className="h-3 w-3" />
+                                                )}
+                                            </Button>
                                         </div>
                                     </div>
                                 )}

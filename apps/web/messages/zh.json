@@ -97,6 +97,8 @@
     "received": "已收到：",
     "remaining": "剩余：",
     "paymentAddress": "付款地址：",
+    "paymentLink": "付款链接",
+    "copyLink": "复制付款链接",
     "network": "网络：",
     "expiresAt": "到期时间：",
     "waitingForPayment": "等待付款...",
