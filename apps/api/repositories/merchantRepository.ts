@@ -18,6 +18,7 @@ export const merchantRepository = {
                 id: true,
                 name: true,
                 email: true,
+                role: true,
                 balanceIDR: true,
                 bankName: true,
                 bankAccount: true,
