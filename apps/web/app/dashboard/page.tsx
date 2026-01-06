@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { FileText } from 'lucide-react'
+import { FileText, Copy, Check } from 'lucide-react'
 import { useTranslations, useLocale } from 'next-intl'
 import { api } from '../../lib/axios.instance'
 import { useAuth } from '../../src/store/useAuth'
@@ -18,6 +18,7 @@ export const dynamic = 'force-dynamic'
 // Tipe Data untuk Transaction
 type Transaction = {
     id: string
+    shortCode?: string | null
     // Field Invoice
     amountInvoice: string | number
     amountUSDT: string | number
@@ -46,6 +47,7 @@ export default function DashboardPage() {
 
     const [data, setData] = useState<DashboardData | null>(null)
     const [loading, setLoading] = useState(true)
+    const [copiedLinks, setCopiedLinks] = useState<Record<string, boolean>>({})
 
     useEffect(() => {
         if (!user) return
@@ -207,16 +209,50 @@ export default function DashboardPage() {
                                                             })()}
                                                         </td>
                                                         <td className="px-4 sm:px-6 py-4 text-center">
-                                                            <Link href={`/invoice/${tx.id}`}>
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="sm"
-                                                                    className="hover:bg-primary/10 hover:text-primary transition-colors"
-                                                                    title={t('viewInvoice')}
-                                                                >
-                                                                    <FileText className="h-4 w-4" />
-                                                                </Button>
-                                                            </Link>
+                                                            <div className="flex items-center justify-center gap-2">
+                                                                <Link href={`/invoice/${tx.id}`}>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        className="hover:bg-primary/10 hover:text-primary transition-colors"
+                                                                        title={t('viewInvoice')}
+                                                                    >
+                                                                        <FileText className="h-4 w-4" />
+                                                                    </Button>
+                                                                </Link>
+                                                                {tx.shortCode && (
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        className="hover:bg-primary/10 hover:text-primary transition-colors"
+                                                                        title={t('copyLink')}
+                                                                        onClick={async () => {
+                                                                            const paymentLink = typeof window !== 'undefined'
+                                                                                ? `${window.location.origin}/pay/${tx.shortCode}`
+                                                                                : `/pay/${tx.shortCode}`
+                                                                            try {
+                                                                                await navigator.clipboard.writeText(paymentLink)
+                                                                                setCopiedLinks(prev => ({ ...prev, [tx.id]: true }))
+                                                                                setTimeout(() => {
+                                                                                    setCopiedLinks(prev => {
+                                                                                        const newState = { ...prev }
+                                                                                        delete newState[tx.id]
+                                                                                        return newState
+                                                                                    })
+                                                                                }, 2000)
+                                                                            } catch (err) {
+                                                                                console.error('Failed to copy:', err)
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        {copiedLinks[tx.id] ? (
+                                                                            <Check className="h-4 w-4 text-green-500" />
+                                                                        ) : (
+                                                                            <Copy className="h-4 w-4" />
+                                                                        )}
+                                                                    </Button>
+                                                                )}
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 ))

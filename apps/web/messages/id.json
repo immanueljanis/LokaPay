@@ -68,7 +68,8 @@
     "payoutSuccess": "Permintaan pencairan berhasil",
     "payoutRequestFailed": "Permintaan pencairan gagal",
     "payoutInsufficient": "Saldo merchant tidak mencukupi untuk pencairan",
-    "payoutAdminNote": "Biaya admin akan diterapkan otomatis."
+    "payoutAdminNote": "Biaya admin akan diterapkan otomatis.",
+    "copyLink": "Salin tautan pembayaran"
   },
   "invoice": {
     "create": "Buat Tagihan Baru",
@@ -197,6 +198,79 @@
   "home": {
     "backToDashboard": "Kembali ke Dashboard",
     "createQrCode": "Buat QR Code"
+  },
+  "landing": {
+    "nav": {
+      "signIn": "Masuk",
+      "getStarted": "Mulai Sekarang"
+    },
+    "hero": {
+      "badge": "Menjembatani Kripto Global ke Perdagangan Lokal",
+      "title1": "Bayar dengan",
+      "title2": "Kripto",
+      "title3": "Terima dalam",
+      "title4": "Rupiah",
+      "subtitle": "LokaPay adalah infrastruktur pembayaran hibrida yang memungkinkan turis asing membayar dengan <strong>stablecoin USDT</strong> sementara merchant Indonesia menerima settlement instan dalam <strong>IDR</strong>.",
+      "cta1": "Mulai Terima Kripto",
+      "cta2": "Lihat Cara Kerja",
+      "touristPays": "Turis Membayar",
+      "merchantReceives": "Merchant Menerima"
+    },
+    "problem": {
+      "title": "Masalah Gesekan Mata Uang",
+      "subtitle": "Setiap tahun, jutaan turis mengunjungi Indonesia dengan aset kripto yang tidak bisa mereka gunakan dengan mudah. Merchant lokal kehilangan penjualan karena hanya bisa menerima Rupiah.",
+      "forTourists": "Untuk Turis",
+      "touristPain1": "Biaya forex tinggi menggerus 3-5% dari setiap transaksi",
+      "touristPain2": "Aset kripto terkunci, tidak bisa digunakan untuk pembelian nyata",
+      "touristPain3": "Proses penukaran dan penarikan yang rumit",
+      "forMerchants": "Untuk Merchant",
+      "merchantPain1": "Kehilangan penjualan dari turis yang memegang kripto",
+      "merchantPain2": "Risiko volatilitas mata uang dengan pembayaran asing",
+      "merchantPain3": "Settlement tertunda dari jalur pembayaran tradisional"
+    },
+    "howItWorks": {
+      "title": "Cara Kerja LokaPay",
+      "subtitle": "Jembatan mulus antara ekonomi kripto global dan ekosistem perdagangan lokal Indonesia.",
+      "step1Title": "Merchant Buat Invoice",
+      "step1Desc": "Merchant memasukkan jumlah dalam IDR dan membuat QR code atau tautan pembayaran unik untuk pelanggan.",
+      "step2Title": "Turis Bayar dengan USDT",
+      "step2Desc": "Pelanggan scan QR dan mengirim USDT dari wallet mereka. Kurs real-time memastikan harga yang adil.",
+      "step3Title": "Settlement IDR Instan",
+      "step3Desc": "Merchant menerima jumlah IDR yang tepat secara instan. Tanpa volatilitas kripto, tanpa biaya forex, tanpa menunggu."
+    },
+    "features": {
+      "title": "Dibangun untuk Ekonomi Riil",
+      "subtitle": "Infrastruktur kelas enterprise yang dirancang untuk transaksi sehari-hari antara turis dan bisnis lokal.",
+      "feature1Title": "Nol Risiko Volatilitas",
+      "feature1Desc": "Merchant selalu menerima jumlah IDR yang tepat. LokaPay menyerap semua fluktuasi mata uang.",
+      "feature2Title": "Settlement Instan",
+      "feature2Desc": "Dana dikreditkan ke akun merchant secara real-time. Tidak ada periode tunggu T+1 atau T+3.",
+      "feature3Title": "Transaksi Tanpa Gas",
+      "feature3Desc": "Pelanggan tidak membayar biaya gas blockchain. Kami menangani semua biaya jaringan di balik layar.",
+      "feature4Title": "Kurs Real-Time",
+      "feature4Desc": "Kurs pasar langsung memastikan harga yang adil untuk turis dan merchant pada saat pembayaran.",
+      "feature5Title": "Ramah UMKM",
+      "feature5Desc": "Dashboard sederhana, pembuatan invoice mudah, dan pencairan instan dirancang untuk usaha kecil.",
+      "feature6Title": "Pengalaman Turis",
+      "feature6Desc": "Tidak perlu unduh aplikasi. Pelanggan membayar dari wallet kripto apa pun yang mendukung USDT."
+    },
+    "stats": {
+      "stat1Value": "<5 detik",
+      "stat1Label": "Rata-rata Waktu Settlement",
+      "stat2Value": "0%",
+      "stat2Label": "Volatilitas Mata Uang untuk Merchant",
+      "stat3Value": "Rp0",
+      "stat3Label": "Biaya Gas untuk Pelanggan"
+    },
+    "cta": {
+      "title": "Siap Menerima Pembayaran Tanpa Batas?",
+      "subtitle": "Bergabunglah dengan jaringan merchant Indonesia yang terus berkembang yang menerima kripto dari turis global. Mulai dalam hitungan menit.",
+      "registerMerchant": "Daftar sebagai Merchant",
+      "signInDashboard": "Masuk ke Dashboard"
+    },
+    "footer": {
+      "copyright": "LokaPay oleh Aetherial Labs. Menjembatani kripto ke perdagangan lokal."
+    }
   }
 }
 

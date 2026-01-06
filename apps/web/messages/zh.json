@@ -68,7 +68,8 @@
     "payoutSuccess": "提现请求成功",
     "payoutRequestFailed": "提现请求失败",
     "payoutInsufficient": "余额不足，无法提现",
-    "payoutAdminNote": "将自动收取手续费。"
+    "payoutAdminNote": "将自动收取手续费。",
+    "copyLink": "复制付款链接"
   },
   "invoice": {
     "create": "创建新发票",
@@ -197,6 +198,79 @@
   "home": {
     "backToDashboard": "返回仪表板",
     "createQrCode": "创建二维码"
+  },
+  "landing": {
+    "nav": {
+      "signIn": "登录",
+      "getStarted": "立即开始"
+    },
+    "hero": {
+      "badge": "连接全球加密货币与本地商业",
+      "title1": "用",
+      "title2": "加密货币",
+      "title3": "支付，以",
+      "title4": "印尼盾",
+      "subtitle": "LokaPay 是混合支付基础设施，使外国游客能够使用 <strong>USDT 稳定币</strong>支付，而印尼商户即时收到 <strong>印尼盾</strong> 结算。",
+      "cta1": "开始接受加密货币",
+      "cta2": "了解运作方式",
+      "touristPays": "游客支付",
+      "merchantReceives": "商户收款"
+    },
+    "problem": {
+      "title": "货币摩擦问题",
+      "subtitle": "每年，数百万游客带着无法轻松消费的加密资产访问印度尼西亚。本地商户因为只能接受印尼盾而错失销售机会。",
+      "forTourists": "对于游客",
+      "touristPain1": "高额外汇费用吃掉每笔交易的 3-5%",
+      "touristPain2": "加密资产被锁定，无法用于实际购买",
+      "touristPain3": "复杂的兑换和提款流程",
+      "forMerchants": "对于商户",
+      "merchantPain1": "失去持有加密货币游客的销售机会",
+      "merchantPain2": "外币支付带来的汇率波动风险",
+      "merchantPain3": "传统支付渠道的延迟结算"
+    },
+    "howItWorks": {
+      "title": "LokaPay 如何运作",
+      "subtitle": "连接全球加密经济与印尼本地商业生态系统的无缝桥梁。",
+      "step1Title": "商户创建发票",
+      "step1Desc": "商户输入印尼盾金额，为客户生成唯一的支付二维码或链接。",
+      "step2Title": "游客用 USDT 支付",
+      "step2Desc": "客户扫描二维码，从钱包发送 USDT。实时汇率确保公平定价。",
+      "step3Title": "即时印尼盾结算",
+      "step3Desc": "商户立即收到准确的印尼盾金额。无加密货币波动、无外汇费用、无需等待。"
+    },
+    "features": {
+      "title": "为实体经济而建",
+      "subtitle": "企业级基础设施，专为游客与本地商户之间的日常交易设计。",
+      "feature1Title": "零波动风险",
+      "feature1Desc": "商户始终收到准确的印尼盾金额。LokaPay 承担所有货币波动。",
+      "feature2Title": "即时结算",
+      "feature2Desc": "资金实时到账。无需等待 T+1 或 T+3。",
+      "feature3Title": "免 Gas 交易",
+      "feature3Desc": "客户无需支付区块链 Gas 费用。我们在后台处理所有网络成本。",
+      "feature4Title": "实时汇率",
+      "feature4Desc": "实时市场汇率确保支付时游客和商户都能获得公平价格。",
+      "feature5Title": "中小企业友好",
+      "feature5Desc": "简单的仪表板、轻松的发票创建和即时提现，专为小型企业设计。",
+      "feature6Title": "游客体验",
+      "feature6Desc": "无需下载应用。客户可从任何支持 USDT 的加密钱包付款。"
+    },
+    "stats": {
+      "stat1Value": "<5秒",
+      "stat1Label": "平均结算时间",
+      "stat2Value": "0%",
+      "stat2Label": "商户货币波动",
+      "stat3Value": "$0",
+      "stat3Label": "客户 Gas 费用"
+    },
+    "cta": {
+      "title": "准备接受无国界支付？",
+      "subtitle": "加入不断壮大的印尼商户网络，接受来自全球游客的加密货币。几分钟内即可开始。",
+      "registerMerchant": "注册成为商户",
+      "signInDashboard": "登录仪表板"
+    },
+    "footer": {
+      "copyright": "LokaPay 由 Aetherial Labs 出品。连接加密货币与本地商业。"
+    }
   }
 }
 

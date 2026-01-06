@@ -68,7 +68,8 @@
     "payoutSuccess": "Payout requested successfully",
     "payoutRequestFailed": "Payout request failed",
     "payoutInsufficient": "Insufficient balance for payout",
-    "payoutAdminNote": "Admin fee will be applied automatically."
+    "payoutAdminNote": "Admin fee will be applied automatically.",
+    "copyLink": "Copy payment link"
   },
   "invoice": {
     "create": "Create New Invoice",
@@ -197,6 +198,79 @@
   "home": {
     "backToDashboard": "Back to Dashboard",
     "createQrCode": "Create QR Code"
+  },
+  "landing": {
+    "nav": {
+      "signIn": "Sign In",
+      "getStarted": "Get Started"
+    },
+    "hero": {
+      "badge": "Bridging Global Crypto to Local Commerce",
+      "title1": "Pay with",
+      "title2": "Crypto",
+      "title3": "Settle in",
+      "title4": "Rupiah",
+      "subtitle": "LokaPay is the hybrid payment infrastructure that enables foreign tourists to pay with <strong>USDT stablecoin</strong> while Indonesian merchants receive instant settlement in <strong>IDR</strong>.",
+      "cta1": "Start Accepting Crypto",
+      "cta2": "See How It Works",
+      "touristPays": "Tourist Pays",
+      "merchantReceives": "Merchant Receives"
+    },
+    "problem": {
+      "title": "The Currency Friction Problem",
+      "subtitle": "Every year, millions of tourists visit Indonesia with crypto assets they can't easily spend. Local merchants miss out on sales because they can only accept Rupiah.",
+      "forTourists": "For Tourists",
+      "touristPain1": "High forex fees eating 3-5% of every transaction",
+      "touristPain2": "Crypto assets locked, unusable for real purchases",
+      "touristPain3": "Complex exchange and withdrawal processes",
+      "forMerchants": "For Merchants",
+      "merchantPain1": "Lost sales from crypto-holding tourists",
+      "merchantPain2": "Currency volatility risk with foreign payments",
+      "merchantPain3": "Delayed settlements from traditional payment rails"
+    },
+    "howItWorks": {
+      "title": "How LokaPay Works",
+      "subtitle": "A seamless bridge between the global crypto economy and Indonesia's local commerce ecosystem.",
+      "step1Title": "Merchant Creates Invoice",
+      "step1Desc": "Merchant enters the amount in IDR and generates a unique payment QR code or link for the customer.",
+      "step2Title": "Tourist Pays with USDT",
+      "step2Desc": "Customer scans the QR and sends USDT from their wallet. Real-time exchange rate ensures fair pricing.",
+      "step3Title": "Instant IDR Settlement",
+      "step3Desc": "Merchant receives the exact IDR amount instantly. No crypto volatility, no forex fees, no waiting."
+    },
+    "features": {
+      "title": "Built for the Real Economy",
+      "subtitle": "Enterprise-grade infrastructure designed for everyday transactions between tourists and local businesses.",
+      "feature1Title": "Zero Volatility Risk",
+      "feature1Desc": "Merchants always receive the exact IDR amount. LokaPay absorbs all currency fluctuation.",
+      "feature2Title": "Instant Settlement",
+      "feature2Desc": "Funds are credited to merchant accounts in real-time. No T+1 or T+3 waiting periods.",
+      "feature3Title": "Gasless Transactions",
+      "feature3Desc": "Customers don't pay blockchain gas fees. We handle all network costs behind the scenes.",
+      "feature4Title": "Real-Time Exchange",
+      "feature4Desc": "Live market rates ensure fair pricing for both tourists and merchants at the moment of payment.",
+      "feature5Title": "SME Friendly",
+      "feature5Desc": "Simple dashboard, easy invoice creation, and instant payouts designed for small businesses.",
+      "feature6Title": "Tourist Experience",
+      "feature6Desc": "No app download required. Customers pay from any crypto wallet that supports USDT."
+    },
+    "stats": {
+      "stat1Value": "<5s",
+      "stat1Label": "Average Settlement Time",
+      "stat2Value": "0%",
+      "stat2Label": "Currency Volatility for Merchants",
+      "stat3Value": "$0",
+      "stat3Label": "Gas Fees for Customers"
+    },
+    "cta": {
+      "title": "Ready to Accept Borderless Payments?",
+      "subtitle": "Join the growing network of Indonesian merchants accepting crypto from global tourists. Get started in minutes.",
+      "registerMerchant": "Register as Merchant",
+      "signInDashboard": "Sign In to Dashboard"
+    },
+    "footer": {
+      "copyright": "LokaPay by Aetherial Labs. Bridging crypto to local commerce."
+    }
   }
 }
 

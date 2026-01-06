@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useLocale } from 'next-intl'
 import { usePathname, useRouter } from 'next/navigation'
 import { Globe } from 'lucide-react'
@@ -19,14 +20,24 @@ const languageNames: Record<string, string> = {
 }
 
 export function FloatingLanguageSwitcher() {
+    const [mounted, setMounted] = useState(false)
     const locale = useLocale()
     const router = useRouter()
     const pathname = usePathname()
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
 
     const switchLocale = (newLocale: string) => {
         const pathWithoutLocale = pathname.replace(/^\/(en|id|zh)/, '') || '/'
         const newPath = `/${newLocale}${pathWithoutLocale === '/' ? '' : pathWithoutLocale}`
         router.replace(newPath)
+    }
+
+    // Prevent hydration mismatch by only rendering on client
+    if (!mounted) {
+        return null
     }
 
     return (
