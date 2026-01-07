@@ -296,7 +296,7 @@ bun dev
 
 **Worker Requirements:**
 - Redis server (runs via Docker Compose)
-- Relayer wallet with sufficient gas (MNT/ETH)
+- Relayer wallet with sufficient gas
 - Access to blockchain RPC endpoint
 - Database connection
 

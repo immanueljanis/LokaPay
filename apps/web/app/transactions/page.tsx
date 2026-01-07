@@ -33,14 +33,10 @@ type TransactionAdmin = {
     expiresAt: string
 }
 
-const getBlockExplorerUrl = (network: string, txHash: string | null): string | null => {
+const getBlockExplorerUrl = (txHash: string | null): string | null => {
     if (!txHash) return null
 
-    const networkLower = network.toLowerCase()
-    if (networkLower === 'mantle' || networkLower.includes('mantle')) {
-        return `https://explorer.sepolia.mantle.xyz/tx/${txHash}`
-    }
-    return null
+    return `${process.env.EXPLORER_URL as string}/tx/${txHash}`
 }
 
 export default function TransactionsPage() {
@@ -90,12 +86,12 @@ export default function TransactionsPage() {
         )
     }
 
-    const renderTxHash = (txHash: string | null, network: string) => {
+    const renderTxHash = (txHash: string) => {
         if (!txHash) {
             return <span className="text-muted-foreground text-xs">-</span>
         }
 
-        const explorerUrl = getBlockExplorerUrl(network, txHash)
+        const explorerUrl = getBlockExplorerUrl(txHash)
         const shortHash = `${txHash.slice(0, 6)}...${txHash.slice(-4)}`
 
         if (explorerUrl) {
@@ -190,11 +186,11 @@ export default function TransactionsPage() {
                                             </td>
                                             <td className="px-4 py-3 text-muted-foreground">
                                                 <span className="px-2 py-1 rounded bg-muted text-xs">
-                                                    {tx.network || 'MANTLE'}
+                                                    {tx.network || process.env.CHAIN_NETWORK as string}
                                                 </span>
                                             </td>
                                             <td className="px-4 py-3">
-                                                {renderTxHash(tx.txHash, tx.network)}
+                                                {renderTxHash(tx.txHash || '')}
                                             </td>
                                             <td className="px-4 py-3 text-muted-foreground">
                                                 {new Date(tx.createdAt).toLocaleString(locale)}

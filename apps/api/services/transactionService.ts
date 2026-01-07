@@ -44,7 +44,7 @@ export const transactionService = {
             amountReceivedIdr: 0,
             tipIdr: 0,
             feeApp: feeApp,
-            network: "MANTLE",
+            network: process.env.NETWORK as string,
             paymentAddress: predictedAddress,
             salt: salt,
             shortCode: shortCode,

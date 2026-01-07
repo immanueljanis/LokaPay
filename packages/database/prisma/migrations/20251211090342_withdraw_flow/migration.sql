@@ -56,7 +56,7 @@ CREATE TABLE "transactions" (
     "salt" TEXT,
     "isDeployed" BOOLEAN NOT NULL DEFAULT false,
     "gelatoTaskId" TEXT,
-    "network" TEXT NOT NULL DEFAULT 'MANTLE',
+    "network" TEXT NOT NULL,
     "txHash" TEXT,
     "status" "TransactionStatus" NOT NULL DEFAULT 'PENDING',
     "expiresAt" TIMESTAMP(3) NOT NULL,

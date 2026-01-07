@@ -3,32 +3,25 @@ require("dotenv").config();
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-    solidity: "0.8.26", // Pastikan versi ini cocok dengan file .sol Anda (tadi 0.8.20)
+    solidity: "0.8.26",
     networks: {
-        // Mantle Sepolia (Testnet)
-        mantleSepolia: {
-            url: "https://rpc.sepolia.mantle.xyz",
+        [process.env.CHAIN_NETWORK as string]: {
+            url: process.env.RPC_URL,
             accounts: process.env.DEPLOYER_PRIVATE_KEY ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
-            chainId: 5003,
-        },
-        // Mantle Mainnet
-        mantle: {
-            url: "https://rpc.mantle.xyz",
-            accounts: process.env.DEPLOYER_PRIVATE_KEY ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
-            chainId: 5000,
+            chainId: process.env.CHAIN_ID,
         },
     },
     etherscan: {
         apiKey: {
-            mantleSepolia: "abc", // Blockscout tidak butuh API Key valid
+            [process.env.CHAIN_NETWORK as string]: "abc",
         },
         customChains: [
             {
-                network: "mantleSepolia",
-                chainId: 5003,
+                network: process.env.CHAIN_NETWORK,
+                chainId: process.env.CHAIN_ID,
                 urls: {
-                    apiURL: "https://explorer.sepolia.mantle.xyz/api",
-                    browserURL: "https://explorer.sepolia.mantle.xyz",
+                    apiURL: `${process.env.BLOCK_EXPLORER}/api`,
+                    browserURL: process.env.BLOCK_EXPLORER,
                 },
             },
         ],

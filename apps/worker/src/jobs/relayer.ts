@@ -22,9 +22,9 @@ export async function relayProcessor(job: Job) {
         console.warn("⚠️ PERINGATAN: Saldo Gas Relayer Menipis! Segera isi ulang.");
     }
     const relayerBalanceFormatted = parseFloat(ethers.formatEther(relayerBalance));
-    const minGasRequired = 0.01; // Minimum gas dalam native token (MNT/ETH)
+    const minGasRequired = 0.01;
 
-    console.log(`   Relayer Balance: ${relayerBalanceFormatted} ${process.env.NETWORK === 'MANTLE' ? 'MNT' : 'ETH'}`);
+    console.log(`   Relayer Balance: ${relayerBalanceFormatted} ${process.env.CHAIN_NETWORK as string}`);
 
     if (relayerBalance < ethers.parseEther(minGasRequired.toString())) {
         console.error(`❌ SALDO RELAYER KRITIS! Balance: ${relayerBalanceFormatted}, Minimum: ${minGasRequired}`);
@@ -51,7 +51,7 @@ export async function relayProcessor(job: Job) {
                     const estimatedCost = estimatedGas * (gasPrice.gasPrice || 0n);
                     const estimatedCostFormatted = parseFloat(ethers.formatEther(estimatedCost));
 
-                    console.log(`   Estimated gas cost: ${estimatedCostFormatted} ${process.env.NETWORK === 'MANTLE' ? 'MNT' : 'ETH'}`);
+                    console.log(`   Estimated gas cost: ${estimatedCostFormatted} ${process.env.CHAIN_NETWORK as string}`);
 
                     if (relayerBalance < estimatedCost * 2n) {
                         console.error(`   ❌ Gas tidak cukup untuk deploy! Balance: ${relayerBalanceFormatted}, Estimated: ${estimatedCostFormatted}`);

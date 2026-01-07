@@ -83,7 +83,7 @@ model Transaction {
   gelatoTaskId    String?
   
   // Detail Blockchain
-  network         String            @default("MANTLE") // Chain: MANTLE, BSC, TRON
+  network         String            @default()
   txHash          String?                              // Hash transaksi pembayaran user
   
   status          TransactionStatus @default(PENDING)
