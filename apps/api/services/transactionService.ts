@@ -34,7 +34,7 @@ export const transactionService = {
             shortCode = generateShortCode()
             attempts++
         }
-
+        console.log(process.env.CHAIN_NETWORK)
         const transaction = await transactionRepository.create({
             merchantId: data.merchantId,
             amountInvoice: amountInvoice,
@@ -44,7 +44,7 @@ export const transactionService = {
             amountReceivedIdr: 0,
             tipIdr: 0,
             feeApp: feeApp,
-            network: process.env.NETWORK as string,
+            network: process.env.CHAIN_NETWORK as string,
             paymentAddress: predictedAddress,
             salt: salt,
             shortCode: shortCode,
