@@ -1,4 +1,10 @@
 {
+  "name": "lokapay-monorepo",
+  "version": "1.0.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "docker:up": "docker-compose up",
     "dev:api": "wait-on tcp:5433 && bun run --filter \"*api\" dev",
