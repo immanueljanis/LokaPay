@@ -84,33 +84,118 @@ This will install dependencies for all workspaces:
 
 ### 1. Environment Setup
 
-Create environment files in the following locations:
+Create environment files in the following locations with the required variables:
 
 **`apps/api/.env`**:
 ```env
-RPC_URL="XXX"
-WEBHOOK_BASE_URL="XXX"
-FRONTEND_URL="XXX"
-RELAYER_PRIVATE_KEY="XXX"
-FACTORY_ADDRESS="0xb142872C71F1aa8FCdF2F6f5aEa2cf80B674913c"
-USDT_ADDRESS="0xa83031bcBB0C86162Bd25922467394303f9BC05A"
-COLD_WALLET_ADDRESS="0x10c0E4873D96Fb259Be4D3665ef6515b93FADEfB"
+# Blockchain Configuration
+CHAIN_NETWORK=LISK
+CHAIN_EXPLORER=https://sepolia-blockscout.lisk.com
+RPC_URL=https://rpc.sepolia-api.lisk.com
+
+# Application Configuration
+FRONTEND_URL=http://localhost:3000
+
+# Contract Addresses (Deploy contracts first - see packages/contracts/README.md)
+RELAYER_PRIVATE_KEY=your_relayer_private_key_here
+FACTORY_ADDRESS=0xE6BFC88940da7E0f424aD033F304363BB30dbe25
+USDT_ADDRESS=0x4F4AE7FB677004521f0D92C0aF43cA8f749034c0
+COLD_WALLET_ADDRESS=0x762154693351a54AD292D03efCEF2920387443De
+
+# External Services (IDRX for fiat conversion)
+IDRX_API_KEY=your_idrx_api_key
+IDRX_SECRET_KEY=your_idrx_secret_key
+IDRX_BASE_URL=https://idrx.co/api
 ```
 
 **`apps/web/.env.local`**:
 ```env
-NEXT_PUBLIC_API_URL="XXX"
-JWT_SECRET="XXX"
-NEXT_PUBLIC_APP_URL="XXX"
-NEXT_PUBLIC_USDT_ADDRESS="0xa83031bcBB0C86162Bd25922467394303f9BC05A"
+# Blockchain Configuration
+NEXT_PUBLIC_CHAIN_ID=4202
+NEXT_PUBLIC_USDT_ADDRESS=0x4F4AE7FB677004521f0D92C0aF43cA8f749034c0
+RPC_URL=https://rpc.sepolia-api.lisk.com
+
+# Application URLs
+NEXT_PUBLIC_API_URL=http://localhost:3001
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Authentication
+JWT_SECRET=lokapay-development-secret-key-change-in-production
 ```
 
-### 2. Database Setup
+**`apps/worker/.env`**:
+```env
+# Blockchain Configuration
+CHAIN_NETWORK=LISK
+RPC_URL=https://rpc.sepolia-api.lisk.com
+
+# Database & Cache
+DATABASE_URL=postgresql://lokapay_admin:lokapay_password@localhost:5433/lokapay_db?schema=public
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# Contract Addresses
+RELAYER_PRIVATE_KEY=your_relayer_private_key_here
+FACTORY_ADDRESS=0xE6BFC88940da7E0f424aD033F304363BB30dbe25
+USDT_ADDRESS=0x4F4AE7FB677004521f0D92C0aF43cA8f749034c0
+COLD_WALLET_ADDRESS=0x762154693351a54AD292D03efCEF2920387443De
+```
+
+**`packages/contracts/.env`** (for contract deployment & verification):
+```env
+# Deployment Configuration
+DEPLOYER_PRIVATE_KEY=your_deployer_private_key_here
+CHAIN_ID=4202
+CHAIN_NETWORK=LISK
+CHAIN_EXPLORER=https://sepolia-blockscout.lisk.com
+RPC_URL=https://rpc.sepolia-api.lisk.com
+
+# Verification (Optional - only needed for contract verification)
+ETHERSCAN_API_KEY=your_block_explorer_api_key_here
+BLOCK_EXPLORER_API_KEY=your_block_explorer_api_key_here
+```
+
+**`packages/database/.env`** (or root `.env`):
+```env
+DATABASE_URL=postgresql://lokapay_admin:lokapay_password@localhost:5433/lokapay_db?schema=public
+```
+
+### 2. Smart Contracts Deployment
+
+Deploy smart contracts to the blockchain (LISK Sepolia testnet):
+
+```bash
+cd packages/contracts
+
+# Install dependencies
+bun install
+
+# Compile contracts
+bun run compile
+
+# Deploy contracts
+bun run deploy --network LISK
+```
+
+After deployment, **save the contract addresses** to your `.env` files:
+- `FACTORY_ADDRESS` → `apps/api/.env` and `apps/worker/.env`
+- `USDT_ADDRESS` → `apps/api/.env`, `apps/worker/.env`, and `apps/web/.env.local`
+- `COLD_WALLET_ADDRESS` → `apps/api/.env` and `apps/worker/.env`
+
+**Verify contracts on block explorer:**
+```bash
+# Set contract addresses in packages/contracts/.env first
+bunx hardhat run scripts/verify.ts --network LISK
+```
+
+For detailed contract documentation, verification instructions, and architecture, see [packages/contracts/README.md](./packages/contracts/README.md)
+
+### 3. Database Setup
 
 Start Docker and initialize the database:
 
 ```bash
-# Start PostgreSQL container
+# Start PostgreSQL and Redis containers
 docker-compose up -d
 
 # Generate Prisma client and push schema
@@ -123,7 +208,7 @@ cd ../../apps/api
 bun run db:seed
 ```
 
-### 3. Run Development Servers
+### 4. Run Development Servers
 
 From the root directory:
 
@@ -138,7 +223,7 @@ This will start:
 - **Database:** PostgreSQL on port 5433
 - **Redis:** Required for job queue (runs via Docker)
 
-### 4. Access the Application
+### 5. Access the Application
 
 - **Merchant Login:** `http://localhost:3000/login`
 - **Admin Login:** Use the seeded admin credentials
