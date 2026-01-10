@@ -42,7 +42,7 @@ LokaPay enables international tourists to pay using **Stablecoins** (USDT), whil
 - 🌐 **Internationalization:** Support for English, Indonesian, and Chinese
 - 📈 **Transaction History:** Complete audit trail of all transactions
 - 🔗 **Block Explorer Integration:** Direct links to transaction hashes on blockchain explorers
-- 💱 **Real-Time Exchange Rates:** Powered by CoinGecko API for accurate USDT/IDR conversion rates
+- 💱 **Real-Time Exchange Rates:** Powered by IDRX API for accurate USDT/IDR conversion rates
 - ⚙️ **Background Job Processing:** Automated payment detection and fund sweeping via worker service
 
 ---
@@ -57,7 +57,7 @@ LokaPay enables international tourists to pay using **Stablecoins** (USDT), whil
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/lokapay.git
+git clone https://github.com/immanueljanis/LokaPay.git
 cd lokapay
 ```
 
@@ -267,11 +267,7 @@ const paymentURI = generateEIP681AddressURI(
 
 ### Exchange Rate Service
 
-LokaPay uses **CoinGecko API** to fetch real-time USDT/IDR exchange rates. The rate is fetched on-demand when creating new invoices to ensure accurate conversion.
-
-**API Endpoint Used:**
-- `https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=idr`
-
+LokaPay uses **IDRX API** to fetch real-time USDT/IDR exchange rates. The rate is fetched on-demand when creating new invoices to ensure accurate conversion.
 The exchange rate is stored with each transaction to maintain historical accuracy and prevent rate fluctuations from affecting completed transactions.
 
 ---
@@ -394,7 +390,7 @@ This project is licensed under the MIT License.
 ```
 MIT License
 
-Copyright (c) 2025 LokaPay
+Copyright (c) 2026 LokaPay
 ```
 
 ---
