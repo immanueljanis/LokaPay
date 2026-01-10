@@ -1,29 +1,31 @@
-require("@nomicfoundation/hardhat-ethers");
+require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
+
+const networkName = process.env.CHAIN_NETWORK || "LISK";
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
     solidity: "0.8.26",
     networks: {
-        [process.env.CHAIN_NETWORK as string]: {
-            url: process.env.RPC_URL,
+        [networkName]: {
+            url: process.env.RPC_URL || "",
             accounts: process.env.DEPLOYER_PRIVATE_KEY ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
-            chainId: Number(process.env.CHAIN_ID),
+            chainId: Number(process.env.CHAIN_ID) || 4202,
         },
     },
     etherscan: {
         apiKey: {
-            [process.env.CHAIN_NETWORK as string]: "abc",
+            [networkName]: process.env.ETHERSCAN_API_KEY || process.env.BLOCK_EXPLORER_API_KEY || "abc",
         },
         customChains: [
             {
-                network: process.env.CHAIN_NETWORK,
-                chainId: Number(process.env.CHAIN_ID),
+                network: networkName,
+                chainId: Number(process.env.CHAIN_ID) || 4202,
                 urls: {
-                    apiURL: `${process.env.BLOCK_EXPLORER}/api`,
-                    browserURL: process.env.BLOCK_EXPLORER,
+                    apiURL: `${process.env.BLOCK_EXPLORER || process.env.CHAIN_EXPLORER || ""}/api`,
+                    browserURL: process.env.BLOCK_EXPLORER || process.env.CHAIN_EXPLORER || "",
                 },
             },
         ],
     },
-};
+}; 
