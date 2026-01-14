@@ -57,7 +57,7 @@ registerPayoutRoutes(app)
 
 console.log('🚀 API Server starting on port 3001...')
 export default {
-    port: 3001,
+    port: process.env.PORT || 3003,
     fetch: app.fetch,
 }
 
