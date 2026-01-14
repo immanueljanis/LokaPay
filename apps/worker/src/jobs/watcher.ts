@@ -14,13 +14,14 @@ export async function runWatcherTask() {
     // Scan transaksi yang masih pending/partial DAN yang sudah PAID/OVERPAID tapi belum di-sweep
     const pendingTx = await prisma.transaction.findMany({
       where: {
+        network: process.env.CHAIN_NETWORK,
         OR: [
           { status: { in: ['PENDING', 'PARTIALLY_PAID'] } },
           {
             status: { in: ['PAID', 'OVERPAID'] },
             sweptAt: null
           }
-        ]
+        ],
       }
     });
 
