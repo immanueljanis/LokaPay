@@ -10,7 +10,7 @@ module.exports = {
         [networkName]: {
             url: process.env.RPC_URL || "",
             accounts: process.env.DEPLOYER_PRIVATE_KEY ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
-            chainId: Number(process.env.CHAIN_ID) || 4202,
+            chainId: Number(process.env.CHAIN_ID),
         },
     },
     etherscan: {
@@ -20,7 +20,7 @@ module.exports = {
         customChains: [
             {
                 network: networkName,
-                chainId: Number(process.env.CHAIN_ID) || 4202,
+                chainId: Number(process.env.CHAIN_ID),
                 urls: {
                     apiURL: `${process.env.BLOCK_EXPLORER || process.env.CHAIN_EXPLORER || ""}/api`,
                     browserURL: process.env.BLOCK_EXPLORER || process.env.CHAIN_EXPLORER || "",
