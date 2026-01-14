@@ -16,12 +16,11 @@ jobs:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-
           script: |
             if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-              echo "Deploying to Lisk (Main Folder)..."
+              echo "Deploying to Lisk (Folder: LokaPay)..."
               cd /root/LokaPay && ./deploy.sh
-            elif [ "${{ github.ref }}" == "refs/heads/lokapay-mantle" ]; then
-              echo "Deploying to Mantle Folder..."
+            elif [ "${{ github.ref }}" == "refs/heads/mantle" ]; then
+              echo "Deploying to Mantle (Folder: lokapay-mantle)..."
               cd /root/lokapay-mantle && ./deploy.sh
             fi

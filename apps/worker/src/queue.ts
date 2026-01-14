@@ -8,7 +8,6 @@ const connection = new IORedis({
 });
 
 const QUEUE_NAME = 'sweep-fund-queue';
-// 2. Export Queue (Dipakai oleh Watcher untuk MENAMBAH tugas)
 export const sweepQueue = new Queue(QUEUE_NAME, { connection });
 
 export const setupWorker = (processor: Processor) => {
