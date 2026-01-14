@@ -33,7 +33,6 @@ bun run build
 cd ../..
 
 # 7. Restart PM2
-# Gunakan absolute path untuk pm2 jika masih error 'command not found'
 if [[ "$(pwd)" == *"/LokaPay"* ]]; then
   echo "♻️ Restarting Lisk Services..."
   pm2 restart lokapay-api lokapay-web lokapay-worker
