@@ -18,9 +18,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-              echo "🚀 Deploying to Lisk (Folder: LokaPay)..."
-              cd /root/LokaPay && ./deploy.sh
-            elif [ "${{ github.ref }}" == "refs/heads/mantle" ]; then
-              echo "🚀 Deploying to Mantle (Folder: lokapay-mantle)..."
-              cd /root/lokapay-mantle && ./deploy.sh
+              cd /root/LokaPay && bash deploy.sh
+            elif [ "${{ github.ref }}" == "refs/heads/lokapay-mantle" ]; then
+              cd /root/lokapay-mantle && bash deploy.sh
             fi
