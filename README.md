@@ -89,18 +89,18 @@ Create environment files in the following locations with the required variables:
 **`apps/api/.env`**:
 ```env
 # Blockchain Configuration
-CHAIN_NETWORK=LISK
-CHAIN_EXPLORER=https://sepolia-blockscout.lisk.com
-RPC_URL=https://rpc.sepolia-api.lisk.com
+CHAIN_NETWORK=MANTLE
+CHAIN_EXPLORER=https://explorer.sepolia.mantle.xyz
+RPC_URL=https://rpc.sepolia.mantle.xyz
 
 # Application Configuration
 FRONTEND_URL=http://localhost:3000
 
 # Contract Addresses (Deploy contracts first - see packages/contracts/README.md)
 RELAYER_PRIVATE_KEY=your_relayer_private_key_here
-FACTORY_ADDRESS=0xE6BFC88940da7E0f424aD033F304363BB30dbe25
-USDT_ADDRESS=0x4F4AE7FB677004521f0D92C0aF43cA8f749034c0
-COLD_WALLET_ADDRESS=0x762154693351a54AD292D03efCEF2920387443De
+FACTORY_ADDRESS=0xb142872C71F1aa8FCdF2F6f5aEa2cf80B674913c
+USDT_ADDRESS=0xa83031bcBB0C86162Bd25922467394303f9BC05A
+COLD_WALLET_ADDRESS=0x10c0E4873D96Fb259Be4D3665ef6515b93FADEfB
 
 # External Services (IDRX for fiat conversion)
 IDRX_API_KEY=your_idrx_api_key
@@ -111,9 +111,9 @@ IDRX_BASE_URL=https://idrx.co/api
 **`apps/web/.env.local`**:
 ```env
 # Blockchain Configuration
-NEXT_PUBLIC_CHAIN_ID=4202
-NEXT_PUBLIC_USDT_ADDRESS=0x4F4AE7FB677004521f0D92C0aF43cA8f749034c0
-RPC_URL=https://rpc.sepolia-api.lisk.com
+NEXT_PUBLIC_CHAIN_ID=5003
+NEXT_PUBLIC_USDT_ADDRESS=0xa83031bcBB0C86162Bd25922467394303f9BC05A
+RPC_URL=https://rpc.sepolia.mantle.xyz
 
 # Application URLs
 NEXT_PUBLIC_API_URL=http://localhost:3001
@@ -126,8 +126,8 @@ JWT_SECRET=lokapay-development-secret-key-change-in-production
 **`apps/worker/.env`**:
 ```env
 # Blockchain Configuration
-CHAIN_NETWORK=LISK
-RPC_URL=https://rpc.sepolia-api.lisk.com
+CHAIN_NETWORK=MANTLE
+RPC_URL=https://rpc.sepolia.mantle.xyz
 
 # Database & Cache
 DATABASE_URL=postgresql://lokapay_admin:lokapay_password@localhost:5433/lokapay_db?schema=public
@@ -136,19 +136,19 @@ REDIS_PORT=6379
 
 # Contract Addresses
 RELAYER_PRIVATE_KEY=your_relayer_private_key_here
-FACTORY_ADDRESS=0xE6BFC88940da7E0f424aD033F304363BB30dbe25
-USDT_ADDRESS=0x4F4AE7FB677004521f0D92C0aF43cA8f749034c0
-COLD_WALLET_ADDRESS=0x762154693351a54AD292D03efCEF2920387443De
+FACTORY_ADDRESS=0xb142872C71F1aa8FCdF2F6f5aEa2cf80B674913c
+USDT_ADDRESS=0xa83031bcBB0C86162Bd25922467394303f9BC05A
+COLD_WALLET_ADDRESS=0x10c0E4873D96Fb259Be4D3665ef6515b93FADEfB
 ```
 
 **`packages/contracts/.env`** (for contract deployment & verification):
 ```env
 # Deployment Configuration
 DEPLOYER_PRIVATE_KEY=your_deployer_private_key_here
-CHAIN_ID=4202
-CHAIN_NETWORK=LISK
-CHAIN_EXPLORER=https://sepolia-blockscout.lisk.com
-RPC_URL=https://rpc.sepolia-api.lisk.com
+CHAIN_ID=5003
+CHAIN_NETWORK=MANTLE
+CHAIN_EXPLORER=https://explorer.sepolia.mantle.xyz
+RPC_URL=https://rpc.sepolia.mantle.xyz
 
 # Verification (Optional - only needed for contract verification)
 ETHERSCAN_API_KEY=your_block_explorer_api_key_here
@@ -162,7 +162,7 @@ DATABASE_URL=postgresql://lokapay_admin:lokapay_password@localhost:5433/lokapay_
 
 ### 2. Smart Contracts Deployment
 
-Deploy smart contracts to the blockchain (LISK Sepolia testnet):
+Deploy smart contracts to the blockchain (Mantle Sepolia testnet):
 
 ```bash
 cd packages/contracts
@@ -174,7 +174,7 @@ bun install
 bun run compile
 
 # Deploy contracts
-bun run deploy --network LISK
+bun run deploy --network MANTLE
 ```
 
 After deployment, **save the contract addresses** to your `.env` files:
@@ -185,7 +185,7 @@ After deployment, **save the contract addresses** to your `.env` files:
 **Verify contracts on block explorer:**
 ```bash
 # Set contract addresses in packages/contracts/.env first
-bunx hardhat run scripts/verify.ts --network LISK
+bunx hardhat run scripts/verify.ts --network MANTLE
 ```
 
 For detailed contract documentation, verification instructions, and architecture, see [packages/contracts/README.md](./packages/contracts/README.md)
