@@ -1,0 +1,27 @@
+name: LokaPay Auto-Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - lokapay-mantle
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploying via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+          script: |
+            if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+              echo "Deploying to Lisk (Main Folder)..."
+              cd /root/LokaPay && ./deploy.sh
+            elif [ "${{ github.ref }}" == "refs/heads/lokapay-mantle" ]; then
+              echo "Deploying to Mantle Folder..."
+              cd /root/lokapay-mantle && ./deploy.sh
+            fi
