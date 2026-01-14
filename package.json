@@ -6,6 +6,10 @@
     "packages/*"
   ],
   "scripts": {
+    "start:api": "bun run --filter \"*api\" start",
+    "start:web": "bun run --filter \"*web\" start",
+    "start:worker": "bun run --filter \"*worker\" start",
+
     "docker:up": "docker-compose up",
     "dev:api": "wait-on tcp:5433 && bun run --filter \"*api\" dev",
     "dev:web": "bun run --filter \"*web\" dev",
