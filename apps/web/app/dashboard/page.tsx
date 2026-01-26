@@ -21,10 +21,10 @@ type Transaction = {
     shortCode?: string | null
     // Field Invoice
     amountInvoice: string | number
-    amountUSDT: string | number
+    amountUSD: string | number
     exchangeRate: string | number
     // Field Payment Received
-    amountReceivedUSDT: string | number
+    amountReceivedUSD: string | number
     amountReceivedIdr: string | number
     // Field Breakdown
     tipIdr: string | number

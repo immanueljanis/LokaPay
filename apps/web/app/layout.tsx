@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   keywords: [
     "LokaPay",
     "Crypto Payment Gateway",
-    "USDT to IDR",
+    "USD to IDR",
     "Stablecoin to IDR",
     "Borderless Payments",
     "Web3 POS",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
   openGraph: {
     title: "LokaPay",
-    description: "The seamless bridge between global crypto assets and local commerce. Tourists pay in USDT, merchants receive Rupiah instantly without high fees.",
+    description: "The seamless bridge between global crypto assets and local commerce. Tourists pay in USDC, merchants receive Rupiah instantly without high fees.",
     url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
     images: [{ url: '/logo/logoWithText.png' }],
     siteName: "LokaPay",
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "LokaPay",
-    description: "The seamless bridge between global crypto assets and local commerce. Tourists pay in USDT, merchants receive Rupiah instantly without high fees.",
+    description: "The seamless bridge between global crypto assets and local commerce. Tourists pay in USDC, merchants receive Rupiah instantly without high fees.",
     creator: "@lokapay",
   },
   alternates: {

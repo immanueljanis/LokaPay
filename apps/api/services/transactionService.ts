@@ -13,10 +13,10 @@ export const transactionService = {
         }
 
         const amountInvoice = data.amountIDR
-        const rawUSDT = amountInvoice / rate
-        const spreadUSDT = rawUSDT * SPREAD_VALUE
-        const calculatedUSDT = rawUSDT + spreadUSDT
-        const finalUSDT = roundUpTo(calculatedUSDT, 3)
+        const rawUSD = amountInvoice / rate
+        const spreadUSD = rawUSD * SPREAD_VALUE
+        const calculatedUSD = rawUSD + spreadUSD
+        const finalUSD = roundUpTo(calculatedUSD, 3)
         const feeApp = amountInvoice * TRANSACTION_FEE
 
         const invoiceUUID = crypto.randomUUID()
@@ -38,9 +38,9 @@ export const transactionService = {
         const transaction = await transactionRepository.create({
             merchantId: data.merchantId,
             amountInvoice: amountInvoice,
-            amountUSDT: finalUSDT,
+            amountUSD: finalUSD,
             exchangeRate: rate,
-            amountReceivedUSDT: 0,
+            amountReceivedUSD: 0,
             amountReceivedIdr: 0,
             tipIdr: 0,
             feeApp: feeApp,
@@ -56,7 +56,7 @@ export const transactionService = {
             invoiceId: transaction.id,
             shortCode: (transaction as any).shortCode || null,
             amountInvoice: amountInvoice,
-            amountUSDT: finalUSDT,
+            amountUSD: finalUSD,
             exchangeRate: rate,
             feeApp: feeApp,
             paymentAddress: predictedAddress,

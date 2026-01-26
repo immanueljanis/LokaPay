@@ -6,7 +6,7 @@
 
 > **LokaPay is a hybrid payment infrastructure that bridges the global crypto economy with the local real economy.**
 
-LokaPay enables international tourists to pay using **Stablecoins** (USDT), while local merchants (SMEs) receive instant balance in **Rupiah (IDR)** without expensive credit card fees or physical money changers.
+LokaPay enables international tourists to pay using **Stablecoins** (USDC), while local merchants (SMEs) receive instant balance in **Rupiah (IDR)** without expensive credit card fees or physical money changers.
 
 ---
 
@@ -23,7 +23,7 @@ LokaPay enables international tourists to pay using **Stablecoins** (USDT), whil
 
 | Problem | Solution |
 | :--- | :--- |
-| **Currency Friction** | Instant conversion: Pay with your stablecoin USDT, system auto-converts to Rupiah |
+| **Currency Friction** | Instant conversion: Pay with your stablecoin USDC, system auto-converts to Rupiah |
 | **High Fees** | Low cost: Leverage blockchain efficiency with minimal fees |
 | **Merchant Gap** | Web2 Experience: Merchants don't need to understand crypto. Just scan QR like QRIS |
 | **Complexity** | Simple Setup: Easy registration, instant settlement, no hardware required |
@@ -32,7 +32,7 @@ LokaPay enables international tourists to pay using **Stablecoins** (USDT), whil
 
 ## ✨ Features
 
-- 🌍 **Multi-Currency Support:** Accept USDT payments, receive IDR instantly
+- 🌍 **Multi-Currency Support:** Accept USDC payments, receive IDR instantly
 - 💰 **Instant Settlement:** Real-time balance updates for merchants
 - 📱 **QR Code Payments:** Simple QR code scanning for customers
 - 🎯 **Role-Based Access:** Separate interfaces for merchants and admins
@@ -42,7 +42,7 @@ LokaPay enables international tourists to pay using **Stablecoins** (USDT), whil
 - 🌐 **Internationalization:** Support for English, Indonesian, and Chinese
 - 📈 **Transaction History:** Complete audit trail of all transactions
 - 🔗 **Block Explorer Integration:** Direct links to transaction hashes on blockchain explorers
-- 💱 **Real-Time Exchange Rates:** Powered by IDRX API for accurate USDT/IDR conversion rates
+- 💱 **Real-Time Exchange Rates:** Powered by IDRX API for accurate USDC/IDR conversion rates
 - ⚙️ **Background Job Processing:** Automated payment detection and fund sweeping via worker service
 
 ---
@@ -99,7 +99,7 @@ FRONTEND_URL=http://localhost:3000
 # Contract Addresses (Deploy contracts first - see packages/contracts/README.md)
 RELAYER_PRIVATE_KEY=your_relayer_private_key_here
 FACTORY_ADDRESS=0xE6BFC88940da7E0f424aD033F304363BB30dbe25
-USDT_ADDRESS=0x4F4AE7FB677004521f0D92C0aF43cA8f749034c0
+USDC_ADDRESS=0x4F4AE7FB677004521f0D92C0aF43cA8f749034c0
 COLD_WALLET_ADDRESS=0x762154693351a54AD292D03efCEF2920387443De
 
 # External Services (IDRX for fiat conversion)
@@ -112,7 +112,7 @@ IDRX_BASE_URL=https://idrx.co/api
 ```env
 # Blockchain Configuration
 NEXT_PUBLIC_CHAIN_ID=4202
-NEXT_PUBLIC_USDT_ADDRESS=0x4F4AE7FB677004521f0D92C0aF43cA8f749034c0
+NEXT_PUBLIC_USDC_ADDRESS=0x4F4AE7FB677004521f0D92C0aF43cA8f749034c0
 RPC_URL=https://rpc.sepolia-api.lisk.com
 
 # Application URLs
@@ -137,7 +137,7 @@ REDIS_PORT=6379
 # Contract Addresses
 RELAYER_PRIVATE_KEY=your_relayer_private_key_here
 FACTORY_ADDRESS=0xE6BFC88940da7E0f424aD033F304363BB30dbe25
-USDT_ADDRESS=0x4F4AE7FB677004521f0D92C0aF43cA8f749034c0
+USDC_ADDRESS=0x4F4AE7FB677004521f0D92C0aF43cA8f749034c0
 COLD_WALLET_ADDRESS=0x762154693351a54AD292D03efCEF2920387443De
 ```
 
@@ -179,7 +179,7 @@ bun run deploy --network LISK
 
 After deployment, **save the contract addresses** to your `.env` files:
 - `FACTORY_ADDRESS` → `apps/api/.env` and `apps/worker/.env`
-- `USDT_ADDRESS` → `apps/api/.env`, `apps/worker/.env`, and `apps/web/.env.local`
+- `USDC_ADDRESS` → `apps/api/.env`, `apps/worker/.env`, and `apps/web/.env.local`
 - `COLD_WALLET_ADDRESS` → `apps/api/.env` and `apps/worker/.env`
 
 **Verify contracts on block explorer:**
@@ -260,14 +260,14 @@ import { generateEIP681AddressURI } from '@/src/constants/network'
 
 const paymentURI = generateEIP681AddressURI(
   recipientAddress,
-  amountUSDT,
+  amountUSDC,
   chainId
 )
 ```
 
 ### Exchange Rate Service
 
-LokaPay uses **IDRX API** to fetch real-time USDT/IDR exchange rates. The rate is fetched on-demand when creating new invoices to ensure accurate conversion.
+LokaPay uses **IDRX API** to fetch real-time USDC/IDR exchange rates. The rate is fetched on-demand when creating new invoices to ensure accurate conversion.
 The exchange rate is stored with each transaction to maintain historical accuracy and prevent rate fluctuations from affecting completed transactions.
 
 ---
@@ -341,7 +341,7 @@ The worker service (`apps/worker`) is a background job processor that handles tw
 #### 1. Payment Watcher Job
 Runs every **15 seconds** via cron to:
 - **Monitor Transaction Status:** Scans all pending and partially paid transactions
-- **Detect Payments:** Checks USDT balance on payment addresses using blockchain RPC
+- **Detect Payments:** Checks USDC balance on payment addresses using blockchain RPC
 - **Update Status:** Automatically updates transaction status (PENDING → PARTIALLY_PAID → PAID → OVERPAID)
 - **Credit Merchant Balance:** When payment is confirmed, credits merchant's IDR balance atomically
 - **Trigger Sweeps:** Queues completed transactions for fund sweeping
@@ -355,7 +355,7 @@ Runs every **15 seconds** via cron to:
 #### 2. Relayer Job
 Processes jobs from a Redis queue to:
 - **Deploy Vault Contracts:** Deploys CREATE2 deterministic vault contracts when needed
-- **Sweep Funds:** Transfers USDT from payment vaults to the cold wallet
+- **Sweep Funds:** Transfers USDC from payment vaults to the cold wallet
 - **Gas Management:** Monitors relayer wallet balance and prevents operations if gas is insufficient
 - **Error Handling:** Retries failed jobs automatically with proper error logging
 

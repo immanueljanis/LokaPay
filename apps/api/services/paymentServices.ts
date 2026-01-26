@@ -14,7 +14,7 @@ export async function processIncomingPayment(address: string, amount: number, tx
 
     const now = new Date()
     const isExpired = now > transaction.expiresAt
-    let expectedUSDT = parseFloat(transaction.amountUSDT.toString())
+    let expectedUSD = parseFloat(transaction.amountUSD.toString())
     let finalRate = parseFloat(transaction.exchangeRate.toString())
     let isRateUpdated = false
 
@@ -22,15 +22,15 @@ export async function processIncomingPayment(address: string, amount: number, tx
         console.log(`⚠️ Late Payment! ID: ${transaction.id}`)
     }
 
-    const currentReceivedUSDT = parseFloat(transaction.amountReceivedUSDT.toString())
-    const totalReceivedUSDT = currentReceivedUSDT + amount
+    const currentReceivedUSD = parseFloat(transaction.amountReceivedUSD.toString())
+    const totalReceivedUSD = currentReceivedUSD + amount
 
     let newStatus = transaction.status
 
-    if (totalReceivedUSDT < (expectedUSDT - 0.0001)) {
+    if (totalReceivedUSD < (expectedUSD - 0.0001)) {
         newStatus = 'PARTIALLY_PAID'
         console.log(`🟡 Partial Payment`)
-    } else if (totalReceivedUSDT > (expectedUSDT + 0.1)) {
+    } else if (totalReceivedUSD > (expectedUSD + 0.1)) {
         newStatus = 'OVERPAID'
         console.log(`🟢 Overpaid (Tip)`)
     } else {
@@ -38,27 +38,27 @@ export async function processIncomingPayment(address: string, amount: number, tx
         console.log(`✅ Paid Lunas`)
     }
 
-    const amountReceivedIdr = Math.floor(totalReceivedUSDT * finalRate)
+    const amountReceivedIdr = Math.floor(totalReceivedUSD * finalRate)
     const amountInvoice = parseFloat(transaction.amountInvoice.toString())
     const feeApp = amountInvoice * 0.015
 
     let tipIdr = 0
     if (newStatus === 'OVERPAID') {
-        const excessUSDT = totalReceivedUSDT - expectedUSDT
-        tipIdr = Math.floor(excessUSDT * finalRate)
+        const excessUSD = totalReceivedUSD - expectedUSD
+        tipIdr = Math.floor(excessUSD * finalRate)
     }
 
-    if (totalReceivedUSDT > currentReceivedUSDT) {
+    if (totalReceivedUSD > currentReceivedUSD) {
         await prisma.$transaction(async (tx) => {
             await tx.transaction.update({
                 where: { id: transaction.id },
                 data: {
                     status: newStatus,
-                    amountReceivedUSDT: totalReceivedUSDT,
+                    amountReceivedUSD: totalReceivedUSD,
                     amountReceivedIdr: amountReceivedIdr,
                     tipIdr: tipIdr,
                     feeApp: feeApp,
-                    amountUSDT: isRateUpdated ? expectedUSDT : undefined,
+                    amountUSD: isRateUpdated ? expectedUSD : undefined,
                     exchangeRate: isRateUpdated ? finalRate : undefined,
                     txHash: txHash,
                     confirmedAt: (newStatus === 'PAID' || newStatus === 'OVERPAID') ? new Date() : undefined,

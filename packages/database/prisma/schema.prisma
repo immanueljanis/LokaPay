@@ -10,15 +10,14 @@ datasource db {
 model Merchant {
   id            String   @id @default(uuid())
   email         String   @unique
-  passwordHash  String   // Disimpan terenkripsi (bcrypt/argon2)
-  name          String   // Nama Toko (Contoh: "Nasi Goreng Pak Bagus")
+  passwordHash  String   
+  name          String   
   role          String   @default("MERCHANT")
-  walletAddress String?  // Alamat wallet pribadi merchant (opsional untuk MVP)
-  bankName      String?  // Contoh: BCA
-  bankAccount   String?  // Contoh: 1234567890
+  walletAddress String?  
+  bankName      String?  
+  bankAccount   String?  
   bankHolder    String?
   
-  // Saldo Virtual (Rupiah)
   balanceIDR    Decimal  @default(0) @db.Decimal(18, 2)
 
   transactions  Transaction[]
@@ -64,17 +63,17 @@ model Transaction {
   merchant        Merchant          @relation(fields: [merchantId], references: [id])
 
   // Detail Nominal - Invoice
-  amountInvoice   Decimal           @db.Decimal(18, 2) // Jumlah tagihan dalam IDR (Rp 50.000)
-  amountUSDT      Decimal           @db.Decimal(18, 6) // Jumlah tagihan dalam USDT (termasuk spread)
-  exchangeRate    Decimal           @db.Decimal(18, 2) // Exchange rate saat transaksi (IDR per USDT)
+  amountInvoice   Decimal           @db.Decimal(18, 2)
+  amountUSD       Decimal           @default(0) @db.Decimal(18, 6)
+  exchangeRate    Decimal           @db.Decimal(18, 2)
   
   // Detail Nominal - Payment Received
-  amountReceivedUSDT Decimal        @default(0) @db.Decimal(18, 6) // Jumlah USDT yang diterima
-  amountReceivedIdr   Decimal       @default(0) @db.Decimal(18, 2) // Jumlah IDR yang diterima (amountReceivedUSDT * exchangeRate)
+  amountReceivedUSD Decimal         @default(0) @db.Decimal(18, 6)
+  amountReceivedIdr   Decimal       @default(0) @db.Decimal(18, 2)
   
   // Detail Nominal - Breakdown
-  tipIdr          Decimal           @default(0) @db.Decimal(18, 2) // Tip jika overpaid (dalam IDR)
-  feeApp          Decimal           @default(0) @db.Decimal(18, 2) // Fee aplikasi (1.5% dari amountInvoice)
+  tipIdr          Decimal           @default(0) @db.Decimal(18, 2)
+  feeApp          Decimal           @default(0) @db.Decimal(18, 2)
   
   paymentAddress  String            @unique            
   salt            String?           @unique            
@@ -84,15 +83,15 @@ model Transaction {
   
   // Detail Blockchain
   network         String
-  txHash          String?                              // Hash transaksi pembayaran user
+  txHash          String?
   
   status          TransactionStatus @default(PENDING)
   
   // Waktu
-  expiresAt       DateTime          // Batas waktu bayar
-  confirmedAt     DateTime?         // Waktu user sukses bayar
-  settledAt       DateTime?         // Waktu masuk saldo merchant
-  sweptAt         DateTime?         // Waktu sukses disapu ke Cold Wallet
+  expiresAt       DateTime         
+  confirmedAt     DateTime?        
+  settledAt       DateTime?        
+  sweptAt         DateTime?        
 
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
@@ -105,9 +104,9 @@ model Transaction {
 
 model RateHistory {
   id        Int      @id @default(autoincrement())
-  pair      String   @default("USDT/IDR")
+  pair      String   @default("USDC/IDR")
   rate      Decimal  @db.Decimal(18, 2)
-  source    String   // Sumber API (misal: "Binance", "CoinGecko")
+  source    String  
   timestamp DateTime @default(now())
 
   @@map("rates")

@@ -4,7 +4,7 @@ const provider = new ethers.JsonRpcProvider(process.env.RPC_URL)
 const relayerSigner = new ethers.Wallet(process.env.RELAYER_PRIVATE_KEY!, provider)
 
 const FACTORY_ADDRESS = process.env.FACTORY_ADDRESS!
-export const USDT_ADDRESS = process.env.USDT_ADDRESS!
+export const USDC_ADDRESS = process.env.USDC_ADDRESS!
 
 const FACTORY_ABI = [
     "function getVaultAddress(bytes32 salt, address owner) view returns (address)",

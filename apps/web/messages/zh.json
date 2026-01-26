@@ -89,9 +89,9 @@
     "paidExtra": "您多付了：",
     "excessToMerchant": "此超额将进入商户余额。",
     "paid": "已付 (IDR)",
-    "paidUsdt": "已付 (USDT)",
+    "paidUsdc": "已付 (USDC)",
     "invoiceIdr": "发票 (IDR)",
-    "invoiceUsdt": "发票 (USDT)",
+    "invoiceUsdc": "发票 (USDC)",
     "amountToPay": "应付金额：",
     "rate": "汇率：",
     "partialPayment": "部分付款！",
@@ -210,7 +210,7 @@
       "title2": "加密货币",
       "title3": "支付，以",
       "title4": "印尼盾",
-      "subtitle": "LokaPay 是混合支付基础设施，使外国游客能够使用 <strong>USDT 稳定币</strong>支付，而印尼商户即时收到 <strong>印尼盾</strong> 结算。",
+      "subtitle": "LokaPay 是混合支付基础设施，使外国游客能够使用 <strong>USDC 稳定币</strong>支付，而印尼商户即时收到 <strong>印尼盾</strong> 结算。",
       "cta1": "开始接受加密货币",
       "cta2": "了解运作方式",
       "touristPays": "游客支付",
@@ -233,8 +233,8 @@
       "subtitle": "连接全球加密经济与印尼本地商业生态系统的无缝桥梁。",
       "step1Title": "商户创建发票",
       "step1Desc": "商户输入印尼盾金额，为客户生成唯一的支付二维码或链接。",
-      "step2Title": "游客用 USDT 支付",
-      "step2Desc": "客户扫描二维码，从钱包发送 USDT。实时汇率确保公平定价。",
+      "step2Title": "游客用 USDC 支付",
+      "step2Desc": "客户扫描二维码，从钱包发送 USDC。实时汇率确保公平定价。",
       "step3Title": "即时印尼盾结算",
       "step3Desc": "商户立即收到准确的印尼盾金额。无加密货币波动、无外汇费用、无需等待。"
     },
@@ -252,7 +252,7 @@
       "feature5Title": "中小企业友好",
       "feature5Desc": "简单的仪表板、轻松的发票创建和即时提现，专为小型企业设计。",
       "feature6Title": "游客体验",
-      "feature6Desc": "无需下载应用。客户可从任何支持 USDT 的加密钱包付款。"
+      "feature6Desc": "无需下载应用。客户可从任何支持 USDC 的加密钱包付款。"
     },
     "stats": {
       "stat1Value": "<5秒",

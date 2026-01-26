@@ -5,7 +5,7 @@ import {
     relayerSigner,
     getFactoryContract,
     getVaultContract,
-    USDT_ADDRESS,
+    USDC_ADDRESS,
     provider
 } from '../constants/contracts';
 
@@ -72,11 +72,11 @@ export async function relayProcessor(job: Job) {
         }
 
         // STEP 2: CEK BALANCE SEBELUM SWEEP
-        const usdtContract = new ethers.Contract(USDT_ADDRESS, ERC20_ABI, provider);
-        const vaultBalance = await usdtContract?.balanceOf?.(paymentAddress);
+        const usdcContract = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, provider);
+        const vaultBalance = await usdcContract?.balanceOf?.(paymentAddress);
         const vaultBalanceFormatted = parseFloat(ethers.formatUnits(vaultBalance, 18));
 
-        console.log(`   Vault Balance: ${vaultBalanceFormatted} USDT`);
+        console.log(`   Vault Balance: ${vaultBalanceFormatted} USDC`);
 
         if (vaultBalanceFormatted === 0) {
             console.log(`   ⚠️ Vault balance is 0, skipping sweep`);
@@ -93,7 +93,7 @@ export async function relayProcessor(job: Job) {
         }
 
         // STEP 3: SWEEP TOKENS
-        console.log(`🧹 Sweeping ${vaultBalanceFormatted} USDT ke Hot Wallet...`);
+        console.log(`🧹 Sweeping ${vaultBalanceFormatted} USDC ke Hot Wallet...`);
         const vault = getVaultContract(paymentAddress).connect(relayerSigner) as ethers.Contract;
 
         // Cek apakah vault sudah di-deploy dengan benar
@@ -111,7 +111,7 @@ export async function relayProcessor(job: Job) {
             // Estimate gas untuk melihat apakah transaction akan berhasil
             try {
                 if (vault.sweep.estimateGas && typeof vault.sweep.estimateGas === 'function') {
-                    await vault.sweep.estimateGas(USDT_ADDRESS);
+                    await vault.sweep.estimateGas(USDC_ADDRESS);
                 }
             } catch (estimateError: any) {
                 console.error(`   ⚠️ Gas estimation failed:`, estimateError.message);
@@ -121,7 +121,7 @@ export async function relayProcessor(job: Job) {
                 throw new Error(`Sweep will fail: ${estimateError.reason || estimateError.message}`);
             }
 
-            const sweepTx = await vault.sweep(USDT_ADDRESS);
+            const sweepTx = await vault.sweep(USDC_ADDRESS);
             const sweepTxHash = sweepTx.hash;
             console.log(`   Tx Hash Sweep: ${sweepTxHash}`);
             const receipt = await sweepTx.wait();

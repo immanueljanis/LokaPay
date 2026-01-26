@@ -4,9 +4,9 @@ export const transactionRepository = {
     create: (data: {
         merchantId: string
         amountInvoice: number
-        amountUSDT: number
+        amountUSD: number
         exchangeRate: number
-        amountReceivedUSDT: number
+        amountReceivedUSD: number
         amountReceivedIdr: number
         tipIdr: number
         feeApp: number

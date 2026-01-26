@@ -18,8 +18,8 @@ type TransactionAdmin = {
         email: string
     }
     amountInvoice: string | number
-    amountUSDT: string | number
-    amountReceivedUSDT: string | number
+    amountUSD: string | number
+    amountReceivedUSD: string | number
     amountReceivedIdr: string | number
     exchangeRate: string | number
     tipIdr: string | number
@@ -61,7 +61,7 @@ export default function TransactionsPage() {
     }, [t])
 
     const formatRp = (amount: string | number) => `Rp ${Number(amount).toLocaleString(locale)}`
-    const formatUSDT = (amount: string | number) => `${Number(amount).toFixed(3)} USDT`
+    const formatUSDC = (amount: string | number) => `${Number(amount).toFixed(3)} USDC`
 
     const renderStatusBadge = (status: string) => {
         const statusLower = status.toLowerCase()
@@ -167,7 +167,7 @@ export default function TransactionsPage() {
                                                         {formatRp(tx.amountInvoice)}
                                                     </span>
                                                     <span className="text-xs text-muted-foreground">
-                                                        {formatUSDT(tx.amountUSDT)}
+                                                        {formatUSDC(tx.amountUSD)}
                                                     </span>
                                                 </div>
                                             </td>
@@ -177,7 +177,7 @@ export default function TransactionsPage() {
                                                         {formatRp(tx.amountReceivedIdr)}
                                                     </span>
                                                     <span className="text-xs text-muted-foreground">
-                                                        {formatUSDT(tx.amountReceivedUSDT)}
+                                                        {formatUSDC(tx.amountReceivedUSD)}
                                                     </span>
                                                 </div>
                                             </td>

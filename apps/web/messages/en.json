@@ -89,9 +89,9 @@
     "paidExtra": "You paid extra:",
     "excessToMerchant": "This excess goes to merchant balance.",
     "paid": "Paid (IDR)",
-    "paidUsdt": "Paid (USDT)",
+    "paidUsdc": "Paid (USDC)",
     "invoiceIdr": "Invoice (IDR)",
-    "invoiceUsdt": "Invoice (USDT)",
+    "invoiceUsdc": "Invoice (USDC)",
     "amountToPay": "Amount to Pay:",
     "rate": "Rate:",
     "partialPayment": "PARTIAL PAYMENT!",
@@ -210,7 +210,7 @@
       "title2": "Crypto",
       "title3": "Settle in",
       "title4": "Rupiah",
-      "subtitle": "LokaPay is the hybrid payment infrastructure that enables foreign tourists to pay with <strong>USDT stablecoin</strong> while Indonesian merchants receive instant settlement in <strong>IDR</strong>.",
+      "subtitle": "LokaPay is the hybrid payment infrastructure that enables foreign tourists to pay with <strong>USDC stablecoin</strong> while Indonesian merchants receive instant settlement in <strong>IDR</strong>.",
       "cta1": "Start Accepting Crypto",
       "cta2": "See How It Works",
       "touristPays": "Tourist Pays",
@@ -233,8 +233,8 @@
       "subtitle": "A seamless bridge between the global crypto economy and Indonesia's local commerce ecosystem.",
       "step1Title": "Merchant Creates Invoice",
       "step1Desc": "Merchant enters the amount in IDR and generates a unique payment QR code or link for the customer.",
-      "step2Title": "Tourist Pays with USDT",
-      "step2Desc": "Customer scans the QR and sends USDT from their wallet. Real-time exchange rate ensures fair pricing.",
+      "step2Title": "Tourist Pays with USDC",
+      "step2Desc": "Customer scans the QR and sends USDC from their wallet. Real-time exchange rate ensures fair pricing.",
       "step3Title": "Instant IDR Settlement",
       "step3Desc": "Merchant receives the exact IDR amount instantly. No crypto volatility, no forex fees, no waiting."
     },
@@ -252,7 +252,7 @@
       "feature5Title": "SME Friendly",
       "feature5Desc": "Simple dashboard, easy invoice creation, and instant payouts designed for small businesses.",
       "feature6Title": "Tourist Experience",
-      "feature6Desc": "No app download required. Customers pay from any crypto wallet that supports USDT."
+      "feature6Desc": "No app download required. Customers pay from any crypto wallet that supports USDC."
     },
     "stats": {
       "stat1Value": "<5s",

@@ -89,9 +89,9 @@
     "paidExtra": "Anda membayar lebih:",
     "excessToMerchant": "Kelebihan ini masuk ke saldo merchant.",
     "paid": "Dibayar (IDR)",
-    "paidUsdt": "Dibayar (USDT)",
+    "paidUsdc": "Dibayar (USDC)",
     "invoiceIdr": "Tagihan (IDR)",
-    "invoiceUsdt": "Tagihan (USDT)",
+    "invoiceUsdc": "Tagihan (USDC)",
     "amountToPay": "Jumlah yang Harus Dibayar:",
     "rate": "Kurs:",
     "partialPayment": "PEMBAYARAN SEBAGIAN!",
@@ -210,7 +210,7 @@
       "title2": "Kripto",
       "title3": "Terima dalam",
       "title4": "Rupiah",
-      "subtitle": "LokaPay adalah infrastruktur pembayaran hibrida yang memungkinkan turis asing membayar dengan <strong>stablecoin USDT</strong> sementara merchant Indonesia menerima settlement instan dalam <strong>IDR</strong>.",
+      "subtitle": "LokaPay adalah infrastruktur pembayaran hibrida yang memungkinkan turis asing membayar dengan <strong>stablecoin USDC</strong> sementara merchant Indonesia menerima settlement instan dalam <strong>IDR</strong>.",
       "cta1": "Mulai Terima Kripto",
       "cta2": "Lihat Cara Kerja",
       "touristPays": "Turis Membayar",
@@ -233,8 +233,8 @@
       "subtitle": "Jembatan mulus antara ekonomi kripto global dan ekosistem perdagangan lokal Indonesia.",
       "step1Title": "Merchant Buat Invoice",
       "step1Desc": "Merchant memasukkan jumlah dalam IDR dan membuat QR code atau tautan pembayaran unik untuk pelanggan.",
-      "step2Title": "Turis Bayar dengan USDT",
-      "step2Desc": "Pelanggan scan QR dan mengirim USDT dari wallet mereka. Kurs real-time memastikan harga yang adil.",
+      "step2Title": "Turis Bayar dengan USDC",
+      "step2Desc": "Pelanggan scan QR dan mengirim USDC dari wallet mereka. Kurs real-time memastikan harga yang adil.",
       "step3Title": "Settlement IDR Instan",
       "step3Desc": "Merchant menerima jumlah IDR yang tepat secara instan. Tanpa volatilitas kripto, tanpa biaya forex, tanpa menunggu."
     },
@@ -252,7 +252,7 @@
       "feature5Title": "Ramah UMKM",
       "feature5Desc": "Dashboard sederhana, pembuatan invoice mudah, dan pencairan instan dirancang untuk usaha kecil.",
       "feature6Title": "Pengalaman Turis",
-      "feature6Desc": "Tidak perlu unduh aplikasi. Pelanggan membayar dari wallet kripto apa pun yang mendukung USDT."
+      "feature6Desc": "Tidak perlu unduh aplikasi. Pelanggan membayar dari wallet kripto apa pun yang mendukung USDC."
     },
     "stats": {
       "stat1Value": "<5 detik",

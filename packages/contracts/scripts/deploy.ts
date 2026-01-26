@@ -7,12 +7,12 @@ async function main() {
   console.log("🚀 Deploying to Network:", hre.network.name);
   console.log("👮 Deployer:", deployer.address);
 
-  // 1. Mock USDT
-  const MockUSDT = await ethers.getContractFactory("MockUSDT");
-  const usdt = await MockUSDT.deploy();
-  await usdt.waitForDeployment();
-  const usdtAddress = await usdt.getAddress();
-  console.log("✅ Mock USDT:", usdtAddress);
+  // 1. Mock USDC
+  const MockUSDC = await ethers.getContractFactory("MockUSDC");
+  const usdc = await MockUSDC.deploy();
+  await usdc.waitForDeployment();
+  const usdcAddress = await usdc.getAddress();
+  console.log("✅ Mock USDC:", usdcAddress);
 
   const coldWallet = deployer.address;
 
@@ -26,7 +26,7 @@ async function main() {
 
   console.log("\n--- SIMPAN DI .ENV BACKEND ---");
   console.log(`FACTORY_ADDRESS="${factoryAddress}"`);
-  console.log(`USDT_ADDRESS="${usdtAddress}"`);
+  console.log(`USDC_ADDRESS="${usdcAddress}"`);
   console.log(`COLD_WALLET_ADDRESS="${coldWallet}"`);
   console.log(`RELAYER_PRIVATE_KEY="Isi dengan private key ${deployer.address}"`);
 }

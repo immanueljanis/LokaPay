@@ -1,11 +1,11 @@
 import { ethers } from 'ethers';
 import { prisma } from '@lokapay/database';
-import { provider, USDT_ADDRESS } from '../constants/contracts';
+import { provider, USDC_ADDRESS } from '../constants/contracts';
 import { sweepQueue } from '../queue';
 import { BUFFER_AMOUNT_PAID_OVERPAID } from '../constants/value';
 
 const ERC20_ABI = ["function balanceOf(address owner) view returns (uint256)"];
-const usdtContract = new ethers.Contract(USDT_ADDRESS, ERC20_ABI, provider);
+const usdcContract = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, provider);
 
 export async function runWatcherTask() {
   console.log('👀 [WATCHER] Scanning transactions...');
@@ -35,10 +35,10 @@ export async function runWatcherTask() {
     for (const tx of pendingTx) {
       let balance = 0;
       try {
-        const balanceBN = await usdtContract?.balanceOf?.(tx.paymentAddress);
+        const balanceBN = await usdcContract?.balanceOf?.(tx.paymentAddress);
         balance = parseFloat(ethers.formatUnits(balanceBN, 18));
         if (balance < 0.01) {
-          console.log(`💰 Skipping transaction ${tx.paymentAddress} - Balance too low: ${balance} USDT`);
+          console.log(`💰 Skipping transaction ${tx.paymentAddress} - Balance too low: ${balance} USDC`);
           continue;
         }
       } catch (err) {
@@ -46,22 +46,22 @@ export async function runWatcherTask() {
         continue;
       }
 
-      const recordedBalanceUSDT = parseFloat(tx.amountReceivedUSDT.toString());
+      const recordedBalanceUSD = parseFloat(tx.amountReceivedUSD.toString());
       const isAlreadyFinal = tx.status === 'PAID' || tx.status === 'OVERPAID';
 
       const shouldProcess = isAlreadyFinal
         ? (balance > 0 && !tx.sweptAt)
-        : (balance > recordedBalanceUSDT);
+        : (balance > recordedBalanceUSD);
 
       if (shouldProcess) {
         if (!isAlreadyFinal) {
-          const newMoney = balance - recordedBalanceUSDT;
+          const newMoney = balance - recordedBalanceUSD;
           console.log(`💰 Duit Masuk di ${tx.paymentAddress}: +${newMoney}`);
         } else {
-          console.log(`💰 Checking final transaction ${tx.paymentAddress}: Balance ${balance} USDT, Status: ${tx.status}`);
+          console.log(`💰 Checking final transaction ${tx.paymentAddress}: Balance ${balance} USDC, Status: ${tx.status}`);
         }
 
-        const targetAmount = Number(tx.amountUSDT || 0);
+        const targetAmount = Number(tx.amountUSD || 0);
         const isFullPayment = balance >= targetAmount;
 
         // Hitung semua nilai yang diperlukan
@@ -73,8 +73,8 @@ export async function runWatcherTask() {
         // Hitung tip jika overpaid
         let tipIdr = 0
         if (isFullPayment && balance > targetAmount) {
-          const excessUSDT = balance - targetAmount
-          tipIdr = Math.floor(excessUSDT * exchangeRate)
+          const excessUSD = balance - targetAmount
+          tipIdr = Math.floor(excessUSD * exchangeRate)
         }
 
         // Tentukan status baru (hanya untuk transaksi yang belum final)
@@ -101,7 +101,7 @@ export async function runWatcherTask() {
               where: { id: tx.id },
               data: {
                 // Field Payment Received
-                amountReceivedUSDT: balance,
+                amountReceivedUSD: balance,
                 amountReceivedIdr: amountReceivedIdr,
                 // Field Breakdown
                 tipIdr: tipIdr,
@@ -148,7 +148,7 @@ export async function runWatcherTask() {
                 paymentAddress: tx.paymentAddress,
                 salt: tx.salt
               });
-              console.log(`🚀 Triggered Relayer untuk ${tx.paymentAddress} (Status: ${tx.status}, Balance: ${balance} USDT, Job ID: ${job.id})`);
+              console.log(`🚀 Triggered Relayer untuk ${tx.paymentAddress} (Status: ${tx.status}, Balance: ${balance} USDC, Job ID: ${job.id})`);
             } catch (queueError) {
               console.error(`❌ Gagal menambahkan ke queue untuk ${tx.paymentAddress}:`, queueError);
               console.error(`   Error details:`, queueError instanceof Error ? queueError.message : String(queueError));
@@ -157,7 +157,7 @@ export async function runWatcherTask() {
             console.log(`⏭️ Skip sweep untuk ${tx.paymentAddress} - sudah di-sweep sebelumnya`);
           }
         } else {
-          console.log(`⏸️ Skip sweep untuk ${tx.paymentAddress} - Status: ${tx.status}, Balance: ${balance} USDT, isFinal: ${isFinal}`);
+          console.log(`⏸️ Skip sweep untuk ${tx.paymentAddress} - Status: ${tx.status}, Balance: ${balance} USDC, isFinal: ${isFinal}`);
         }
       }
     }

@@ -20,7 +20,7 @@ Factory contract that deploys individual vault contracts using CREATE2 for deter
 - `getVaultAddress(bytes32 _salt, address _owner)`: Predicts vault address before deployment
 
 ### 2. **LokaVault** (`LokaVault.sol`)
-Individual vault contract deployed per transaction. Each vault holds USDT payments temporarily before being swept to the cold wallet.
+Individual vault contract deployed per transaction. Each vault holds USDC payments temporarily before being swept to the cold wallet.
 
 **Key Features:**
 - Immutable owner (relayer address)
@@ -33,13 +33,13 @@ Individual vault contract deployed per transaction. Each vault holds USDT paymen
 
 **Important Note:** `LokaVault` is **NOT** a single contract address. Each transaction gets its own vault instance deployed via CREATE2. You don't verify "a" LokaVault contract, but individual vault instances if needed.
 
-### 3. **MockUSDT** (`MockUSDT.sol`)
+### 3. **MockUSDC** (`MockUSDC.sol`)
 Mock ERC20 token for testing purposes on testnets.
 
 **Key Features:**
 - Standard ERC20 token implementation
 - Faucet function for testnet token distribution
-- 6 decimal places (like real USDT)
+- 6 decimal places (like real USDC)
 
 ## 🚀 Installation
 
@@ -92,12 +92,12 @@ bunx hardhat run scripts/deploy.ts --network LISK
 ```
 
 **Deployment Order:**
-1. MockUSDT (no constructor arguments)
+1. MockUSDC (no constructor arguments)
 2. LokaFactory (requires `coldWallet` address - uses deployer address by default)
 
 After deployment, the script will output the contract addresses. **Save these addresses** to your `.env` files:
 - `FACTORY_ADDRESS` - Used by API and Worker
-- `USDT_ADDRESS` - Used by API, Worker, and Web
+- `USDC_ADDRESS` - Used by API, Worker, and Web
 - `COLD_WALLET_ADDRESS` - Used by API and Worker
 
 ## ✅ Verification
@@ -109,7 +109,7 @@ Verify deployed contracts on the block explorer:
 Set in `packages/contracts/.env`:
 ```env
 FACTORY_ADDRESS=0xE6BFC88940da7E0f424aD033F304363BB30dbe25
-USDT_ADDRESS=0x4F4AE7FB677004521f0D92C0aF43cA8f749034c0
+USDC_ADDRESS=0x4F4AE7FB677004521f0D92C0aF43cA8f749034c0
 COLD_WALLET_ADDRESS=0x762154693351a54AD292D03efCEF2920387443De
 ```
 
@@ -121,7 +121,7 @@ bunx hardhat run scripts/verify.ts --network LISK
 ### Option 2: Using Command Line Arguments
 
 ```bash
-bunx hardhat run scripts/verify.ts --network LISK -- <factoryAddress> <usdtAddress> <coldWalletAddress>
+bunx hardhat run scripts/verify.ts --network LISK -- <factoryAddress> <usdcAddress> <coldWalletAddress>
 ```
 
 **Example:**
@@ -131,9 +131,9 @@ bunx hardhat run scripts/verify.ts --network LISK -- 0xE6BFC88940da7E0f424aD033F
 
 ### Option 3: Verify Individual Contracts
 
-**Verify MockUSDT:**
+**Verify MockUSDC:**
 ```bash
-bunx hardhat verify --network LISK <mockUSDTAddress>
+bunx hardhat verify --network LISK <mockUSDCAddress>
 ```
 
 **Verify LokaFactory:**
@@ -163,7 +163,7 @@ bun run test
 1. **Factory Deployment**: `LokaFactory` is deployed once with a `coldWallet` address
 2. **Vault Prediction**: For each transaction, the API calls `getVaultAddress()` to predict the vault address
 3. **Vault Deployment**: When payment is detected, the worker deploys the vault using `deployVault()` with CREATE2
-4. **Fund Sweeping**: After payment confirmation, the worker calls `sweep()` to transfer USDT to the cold wallet
+4. **Fund Sweeping**: After payment confirmation, the worker calls `sweep()` to transfer USDC to the cold wallet
 
 ### CREATE2 Deterministic Addresses
 

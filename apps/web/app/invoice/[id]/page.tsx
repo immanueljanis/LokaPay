@@ -20,11 +20,11 @@ type Transaction = {
     shortCode?: string | null
     // Field Invoice
     amountInvoice: string | number
-    amountUSDT: string | number
+    amountUSD: string | number
     exchangeRate: string | number
 
     // Field Payment Received
-    amountReceivedUSDT: string | number
+    amountReceivedUSD: string | number
     amountReceivedIdr: string | number
 
     // Field Breakdown
@@ -119,13 +119,13 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
 
     // Hitung kelebihan untuk ditampilkan
     const amountInvoice = parseFloat((tx.amountInvoice || '0').toString())
-    const amountUSDT = parseFloat((tx.amountUSDT || '0').toString())
+    const amountUSD = parseFloat((tx.amountUSD || '0').toString())
     const exchangeRate = parseFloat((tx.exchangeRate || '0').toString())
     const amountReceivedIdr = parseFloat((tx.amountReceivedIdr || '0').toString())
-    const amountReceivedUSDT = parseFloat((tx.amountReceivedUSDT || '0').toString())
+    const amountReceivedUSD = parseFloat((tx.amountReceivedUSD || '0').toString())
     const tipIdr = parseFloat((tx.tipIdr || '0').toString())
 
-    const totalAmount = Math.max(amountUSDT + tipAmount, 0)
+    const totalAmount = Math.max(amountUSD + tipAmount, 0)
 
     const expiresAt = tx.expiresAt ? new Date(tx.expiresAt) : null
     const expiresAtFormatted = expiresAt ? expiresAt.toLocaleString(locale, {
@@ -142,8 +142,8 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
 
     const tipOptions = [
         { label: 'No Tip', value: 0 },
-        { label: '5%', value: parseFloat((amountUSDT * 0.05).toFixed(3)) },
-        { label: '10%', value: parseFloat((amountUSDT * 0.1).toFixed(3)) },
+        { label: '5%', value: parseFloat((amountUSD * 0.05).toFixed(3)) },
+        { label: '10%', value: parseFloat((amountUSD * 0.1).toFixed(3)) },
     ]
 
     return (
@@ -156,7 +156,7 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
                     <div className="text-2xl font-bold mt-0.5">Rp {Math.floor(amountInvoice).toLocaleString(locale)}</div>
                     {exchangeRate > 0 && (
                         <div className="mt-1 text-xs opacity-80">
-                            ≈ {amountUSDT.toFixed(3)} USDT
+                            ≈ {amountUSD.toFixed(3)} USDC
                         </div>
                     )}
                 </div>
@@ -179,7 +179,7 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
                                         >
                                             {opt.label === 'No Tip'
                                                 ? opt.label
-                                                : `${opt.label} (${opt.value.toFixed(3)} USDT)`}
+                                                : `${opt.label} (${opt.value.toFixed(3)} USDC)`}
                                         </button>
                                     ))}
                                     <div className="flex items-center gap-1">
@@ -195,7 +195,7 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
                                     </div>
                                 </div>
                                 <div className="text-xs text-muted-foreground">
-                                    Total: <span className="font-semibold text-card-foreground">{totalAmount.toFixed(3)} USDT</span>
+                                    Total: <span className="font-semibold text-card-foreground">{totalAmount.toFixed(3)} USDC</span>
                                 </div>
                             </div>
                         </div>
@@ -228,16 +228,16 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
                                     </div>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">{t('paidUsdt')}</span>
-                                    <span className="font-semibold">{amountReceivedUSDT.toFixed(3)} USDT</span>
+                                    <span className="text-muted-foreground">{t('paidUsdc')}</span>
+                                    <span className="font-semibold">{amountReceivedUSD.toFixed(3)} USDC</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-muted-foreground">{t('invoiceIdr')}</span>
                                     <span className="font-semibold">Rp {Math.floor(amountInvoice).toLocaleString(locale)}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">{t('invoiceUsdt')}</span>
-                                    <span className="font-semibold">{amountUSDT.toFixed(3)} USDT</span>
+                                    <span className="text-muted-foreground">{t('invoiceUsdc')}</span>
+                                    <span className="font-semibold">{amountUSD.toFixed(3)} USDC</span>
                                 </div>
                             </div>
 
@@ -267,8 +267,8 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
                                     </div>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">{t('paidUsdt')}</span>
-                                    <span className="font-semibold">{amountReceivedUSDT.toFixed(3)} USDT</span>
+                                    <span className="text-muted-foreground">{t('paidUsdc')}</span>
+                                    <span className="font-semibold">{amountReceivedUSD.toFixed(3)} USDC</span>
                                 </div>
                             </div>
 
@@ -287,9 +287,9 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
                                 <div className="flex justify-between items-center">
                                     <span className="text-muted-foreground">{t('amountToPay')}</span>
                                     <div className="text-right">
-                                        <div className="font-bold text-sm">{totalAmount.toFixed(3)} USDT</div>
+                                        <div className="font-bold text-sm">{totalAmount.toFixed(3)} USDC</div>
                                         <div className="text-xs text-muted-foreground">
-                                            Base {amountUSDT.toFixed(3)} + Tip {tipAmount.toFixed(3)}
+                                            Base {amountUSD.toFixed(3)} + Tip {tipAmount.toFixed(3)}
                                         </div>
                                         <div className="text-xs text-muted-foreground">≈ Rp {Math.floor(amountInvoice).toLocaleString(locale)}</div>
                                     </div>
@@ -297,7 +297,7 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
                                 {exchangeRate > 0 && (
                                     <div className="flex justify-between text-xs pt-1 border-t border-border">
                                         <span className="text-muted-foreground">{t('rate')}</span>
-                                        <span>1 USDT = Rp {exchangeRate.toLocaleString(locale)}</span>
+                                        <span>1 USDC = Rp {exchangeRate.toLocaleString(locale)}</span>
                                     </div>
                                 )}
                             </div>
@@ -306,8 +306,8 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
                             {isPartial && (
                                 <div className="w-full mb-3 bg-accent/20 border border-accent/50 p-2 rounded-lg text-xs text-center font-semibold text-accent-foreground">
                                     ⚠️ {t('partialPayment')} <br />
-                                    {t('received')} Rp {Math.floor(amountReceivedIdr).toLocaleString(locale)} ({amountReceivedUSDT.toFixed(3)} USDT) <br />
-                                    {t('remaining')} Rp {Math.floor(amountInvoice - amountReceivedIdr).toLocaleString(locale)} ({(amountUSDT - amountReceivedUSDT).toFixed(3)} USDT)
+                                    {t('received')} Rp {Math.floor(amountReceivedIdr).toLocaleString(locale)} ({amountReceivedUSD.toFixed(3)} USDC) <br />
+                                    {t('remaining')} Rp {Math.floor(amountInvoice - amountReceivedIdr).toLocaleString(locale)} ({(amountUSD - amountReceivedUSD).toFixed(3)} USDC)
                                 </div>
                             )}
 

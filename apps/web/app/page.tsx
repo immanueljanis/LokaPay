@@ -129,7 +129,7 @@ export default function LandingPage() {
                 </div>
                 <div className="text-left">
                   <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('hero.touristPays')}</p>
-                  <p className="text-xl font-bold text-primary">$50 USDT</p>
+                  <p className="text-xl font-bold text-primary">$50 USDC</p>
                 </div>
               </div>
 
