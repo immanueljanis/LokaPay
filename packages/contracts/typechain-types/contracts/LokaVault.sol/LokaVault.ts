@@ -3,13 +3,10 @@
 /* eslint-disable */
 import type {
   BaseContract,
-  BigNumberish,
   BytesLike,
   FunctionFragment,
   Result,
   Interface,
-  EventFragment,
-  AddressLike,
   ContractRunner,
   ContractMethod,
   Listener,
@@ -18,44 +15,40 @@ import type {
   TypedContractEvent,
   TypedDeferredTopicFilter,
   TypedEventLog,
-  TypedLogDescription,
   TypedListener,
   TypedContractMethod,
-} from "../common";
+} from "../../common";
 
 export interface LokaVaultInterface extends Interface {
   getFunction(
-    nameOrSignature: "COLD_WALLET" | "OWNER" | "sweep"
+    nameOrSignature:
+      | "COLD_WALLET"
+      | "IDRX"
+      | "OWNER"
+      | "ROUTER"
+      | "USDC"
+      | "sweep"
   ): FunctionFragment;
-
-  getEvent(nameOrSignatureOrTopic: "Swept"): EventFragment;
 
   encodeFunctionData(
     functionFragment: "COLD_WALLET",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "IDRX", values?: undefined): string;
   encodeFunctionData(functionFragment: "OWNER", values?: undefined): string;
-  encodeFunctionData(functionFragment: "sweep", values: [AddressLike]): string;
+  encodeFunctionData(functionFragment: "ROUTER", values?: undefined): string;
+  encodeFunctionData(functionFragment: "USDC", values?: undefined): string;
+  encodeFunctionData(functionFragment: "sweep", values?: undefined): string;
 
   decodeFunctionResult(
     functionFragment: "COLD_WALLET",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "IDRX", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "OWNER", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "ROUTER", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "USDC", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "sweep", data: BytesLike): Result;
-}
-
-export namespace SweptEvent {
-  export type InputTuple = [token: AddressLike, amount: BigNumberish];
-  export type OutputTuple = [token: string, amount: bigint];
-  export interface OutputObject {
-    token: string;
-    amount: bigint;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
 }
 
 export interface LokaVault extends BaseContract {
@@ -103,9 +96,15 @@ export interface LokaVault extends BaseContract {
 
   COLD_WALLET: TypedContractMethod<[], [string], "view">;
 
+  IDRX: TypedContractMethod<[], [string], "view">;
+
   OWNER: TypedContractMethod<[], [string], "view">;
 
-  sweep: TypedContractMethod<[_token: AddressLike], [void], "nonpayable">;
+  ROUTER: TypedContractMethod<[], [string], "view">;
+
+  USDC: TypedContractMethod<[], [string], "view">;
+
+  sweep: TypedContractMethod<[], [void], "nonpayable">;
 
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
@@ -115,30 +114,20 @@ export interface LokaVault extends BaseContract {
     nameOrSignature: "COLD_WALLET"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
+    nameOrSignature: "IDRX"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
     nameOrSignature: "OWNER"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
+    nameOrSignature: "ROUTER"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "USDC"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
     nameOrSignature: "sweep"
-  ): TypedContractMethod<[_token: AddressLike], [void], "nonpayable">;
+  ): TypedContractMethod<[], [void], "nonpayable">;
 
-  getEvent(
-    key: "Swept"
-  ): TypedContractEvent<
-    SweptEvent.InputTuple,
-    SweptEvent.OutputTuple,
-    SweptEvent.OutputObject
-  >;
-
-  filters: {
-    "Swept(address,uint256)": TypedContractEvent<
-      SweptEvent.InputTuple,
-      SweptEvent.OutputTuple,
-      SweptEvent.OutputObject
-    >;
-    Swept: TypedContractEvent<
-      SweptEvent.InputTuple,
-      SweptEvent.OutputTuple,
-      SweptEvent.OutputObject
-    >;
-  };
+  filters: {};
 }

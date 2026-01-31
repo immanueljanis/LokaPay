@@ -1,45 +1,41 @@
 import { ethers } from 'ethers'
-import { SPREAD_VALUE, TRANSACTION_FEE } from '../constants/value'
+import { TRANSACTION_FEE } from '../constants/value'
 import { getFactoryContract, relayerSigner } from '../constants/contracts'
-import { getRealExchangeRate, roundUpTo } from '../utils/rate'
+import { pricingService } from '../utils/rate'
+import { roundUpTo } from '../utils/rate'
 import { transactionRepository } from '../repositories/transactionRepository'
 import { generateShortCode } from '../utils/shortCode'
 
 export const transactionService = {
     createTransaction: async (data: { merchantId: string; amountIDR: number }) => {
-        const rate = await getRealExchangeRate()
-        if (!rate) {
-            return { error: 'Failed to get exchange rate' }
+        const rateData = await pricingService.getRateWithSpread(data.amountIDR) as { marketRate: number; finalUSD: number };
+        if (!rateData) {
+            return { error: 'Failed to get exchange rate from IDRX' };
         }
-
+        const { marketRate, finalUSD } = rateData;
         const amountInvoice = data.amountIDR
-        const rawUSD = amountInvoice / rate
-        const spreadUSD = rawUSD * SPREAD_VALUE
-        const calculatedUSD = rawUSD + spreadUSD
-        const finalUSD = roundUpTo(calculatedUSD, 3)
-        const feeApp = amountInvoice * TRANSACTION_FEE
+        const feeApp = amountInvoice * TRANSACTION_FEE;
+        const invoiceUUID = crypto.randomUUID();
+        const salt = ethers.id(invoiceUUID);
 
-        const invoiceUUID = crypto.randomUUID()
-        const salt = ethers.id(invoiceUUID)
+        const factory = getFactoryContract();
+        const predictedAddress = await (factory.getVaultAddress as (salt: string, owner: string) => Promise<string>)(salt, relayerSigner.address);
 
-        const factory = getFactoryContract()
-        const predictedAddress = await (factory.getVaultAddress as (salt: string, owner: string) => Promise<string>)(salt, relayerSigner.address)
-
-        let shortCode = generateShortCode()
-        let attempts = 0
-        const maxAttempts = 10
+        let shortCode = generateShortCode();
+        let attempts = 0;
+        const maxAttempts = 10;
         while (attempts < maxAttempts) {
-            const existing = await transactionRepository.findByShortCode(shortCode)
-            if (!existing) break
-            shortCode = generateShortCode()
-            attempts++
+            const existing = await transactionRepository.findByShortCode(shortCode);
+            if (!existing) break;
+            shortCode = generateShortCode();
+            attempts++;
         }
-        console.log(process.env.CHAIN_NETWORK)
+
         const transaction = await transactionRepository.create({
             merchantId: data.merchantId,
             amountInvoice: amountInvoice,
             amountUSD: finalUSD,
-            exchangeRate: rate,
+            exchangeRate: marketRate,
             amountReceivedUSD: 0,
             amountReceivedIdr: 0,
             tipIdr: 0,
@@ -57,7 +53,7 @@ export const transactionService = {
             shortCode: (transaction as any).shortCode || null,
             amountInvoice: amountInvoice,
             amountUSD: finalUSD,
-            exchangeRate: rate,
+            exchangeRate: marketRate,
             feeApp: feeApp,
             paymentAddress: predictedAddress,
             expiresIn: '5 minutes',

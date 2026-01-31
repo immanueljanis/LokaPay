@@ -24,7 +24,13 @@ import type {
 
 export interface LokaFactoryInterface extends Interface {
   getFunction(
-    nameOrSignature: "coldWallet" | "deployVault" | "getVaultAddress"
+    nameOrSignature:
+      | "coldWallet"
+      | "deployVault"
+      | "getVaultAddress"
+      | "idrx"
+      | "router"
+      | "usdc"
   ): FunctionFragment;
 
   getEvent(nameOrSignatureOrTopic: "VaultDeployed"): EventFragment;
@@ -41,6 +47,9 @@ export interface LokaFactoryInterface extends Interface {
     functionFragment: "getVaultAddress",
     values: [BytesLike, AddressLike]
   ): string;
+  encodeFunctionData(functionFragment: "idrx", values?: undefined): string;
+  encodeFunctionData(functionFragment: "router", values?: undefined): string;
+  encodeFunctionData(functionFragment: "usdc", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "coldWallet", data: BytesLike): Result;
   decodeFunctionResult(
@@ -51,6 +60,9 @@ export interface LokaFactoryInterface extends Interface {
     functionFragment: "getVaultAddress",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "idrx", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "router", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "usdc", data: BytesLike): Result;
 }
 
 export namespace VaultDeployedEvent {
@@ -128,6 +140,12 @@ export interface LokaFactory extends BaseContract {
     "view"
   >;
 
+  idrx: TypedContractMethod<[], [string], "view">;
+
+  router: TypedContractMethod<[], [string], "view">;
+
+  usdc: TypedContractMethod<[], [string], "view">;
+
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
@@ -149,6 +167,15 @@ export interface LokaFactory extends BaseContract {
     [string],
     "view"
   >;
+  getFunction(
+    nameOrSignature: "idrx"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "router"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "usdc"
+  ): TypedContractMethod<[], [string], "view">;
 
   getEvent(
     key: "VaultDeployed"

@@ -14,6 +14,10 @@ import * as Contracts from ".";
 declare module "hardhat/types/runtime" {
   interface HardhatEthersHelpers extends HardhatEthersHelpersBase {
     getContractFactory(
+      name: "Ownable",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Ownable__factory>;
+    getContractFactory(
       name: "IERC1155Errors",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC1155Errors__factory>;
@@ -42,14 +46,35 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.LokaFactory__factory>;
     getContractFactory(
+      name: "MockIDRX",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MockIDRX__factory>;
+    getContractFactory(
+      name: "MockOracle",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MockOracle__factory>;
+    getContractFactory(
+      name: "MockUSDC",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MockUSDC__factory>;
+    getContractFactory(
+      name: "SimpleSwapRouter",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.SimpleSwapRouter__factory>;
+    getContractFactory(
+      name: "IRouter",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IRouter__factory>;
+    getContractFactory(
       name: "LokaVault",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.LokaVault__factory>;
-    getContractFactory(
-      name: "MockUSDT",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.MockUSDT__factory>;
 
+    getContractAt(
+      name: "Ownable",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Ownable>;
     getContractAt(
       name: "IERC1155Errors",
       address: string | ethers.Addressable,
@@ -86,16 +111,40 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.LokaFactory>;
     getContractAt(
-      name: "LokaVault",
+      name: "MockIDRX",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
-    ): Promise<Contracts.LokaVault>;
+    ): Promise<Contracts.MockIDRX>;
     getContractAt(
-      name: "MockUSDT",
+      name: "MockOracle",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
-    ): Promise<Contracts.MockUSDT>;
+    ): Promise<Contracts.MockOracle>;
+    getContractAt(
+      name: "MockUSDC",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.MockUSDC>;
+    getContractAt(
+      name: "SimpleSwapRouter",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.SimpleSwapRouter>;
+    getContractAt(
+      name: "IRouter",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IRouter>;
+    getContractAt(
+      name: "LokaVault",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.LokaVault>;
 
+    deployContract(
+      name: "Ownable",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Ownable>;
     deployContract(
       name: "IERC1155Errors",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -125,14 +174,35 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.LokaFactory>;
     deployContract(
+      name: "MockIDRX",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MockIDRX>;
+    deployContract(
+      name: "MockOracle",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MockOracle>;
+    deployContract(
+      name: "MockUSDC",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MockUSDC>;
+    deployContract(
+      name: "SimpleSwapRouter",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.SimpleSwapRouter>;
+    deployContract(
+      name: "IRouter",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IRouter>;
+    deployContract(
       name: "LokaVault",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.LokaVault>;
-    deployContract(
-      name: "MockUSDT",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.MockUSDT>;
 
+    deployContract(
+      name: "Ownable",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Ownable>;
     deployContract(
       name: "IERC1155Errors",
       args: any[],
@@ -169,15 +239,35 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.LokaFactory>;
     deployContract(
+      name: "MockIDRX",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MockIDRX>;
+    deployContract(
+      name: "MockOracle",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MockOracle>;
+    deployContract(
+      name: "MockUSDC",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MockUSDC>;
+    deployContract(
+      name: "SimpleSwapRouter",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.SimpleSwapRouter>;
+    deployContract(
+      name: "IRouter",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IRouter>;
+    deployContract(
       name: "LokaVault",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.LokaVault>;
-    deployContract(
-      name: "MockUSDT",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.MockUSDT>;
 
     // default types
     getContractFactory(
